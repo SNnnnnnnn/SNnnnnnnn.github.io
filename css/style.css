@@ -16,7 +16,7 @@ TABLE OF CONTENTS:
  7.a) portfolio
  7.b) service
  7.c) experience
- 7.d) testimonial
+ 7.d) motto
  7.e) blog
  7.f) about
  7.g) contact
@@ -188,6 +188,7 @@ img { max-width: 100%; }
   padding: 0;
   margin: 0;
 }
+
 
 /*----------------------------------------- 4) Header --------------------------------------------------*/
 .header {
@@ -772,9 +773,9 @@ ul.portfolio-image li .desc{
 .card:hover:before {
   -webkit-transform: scaleY(1);
 }
-/*---------- d. testimonial -----------*/
-#testimonial {
-  background-image: url(../images/testimonial-bg.jpg);
+/*---------- d. motto -----------*/
+#motto {
+  background-image: url(../images/motto-bg.jpg);
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -786,27 +787,27 @@ ul.portfolio-image li .desc{
   width: 100%;
   height: 550px;
 }
-.list-testimonial {
+.list-motto {
   display: block;
   width: 100%;
 }
-.list-testimonial .content-testimonial {
+.list-motto .content-motto {
   text-align: center;
   color: #ffffff;
 }
-.list-testimonial .content-testimonial .testi {
+.list-motto .content-motto .testi {
   font-size: 16px;
   line-height: 46px;
   letter-spacing: 2px;
 }
-.list-testimonial .content-testimonial .people {
+.list-motto .content-motto .people {
   font-size: 14px;
   margin-top: 30px;
   letter-spacing: 2px;
   color: #B7B7B7;
   font-weight: 700;
 }
-.mask-testimonial{
+.mask-motto{
   background-color: rgba(47, 47, 47, 0.7);
   height: 100%;
   left: 0;
@@ -814,7 +815,7 @@ ul.portfolio-image li .desc{
   top: 0;
   width: 100%;
 }
-.wrap-testimonial{
+.wrap-motto{
   z-index: 1;
   position: relative;
 }
@@ -912,7 +913,7 @@ ul.portfolio-image li .desc{
   width: 100%;
 }
 .bg-about {
-  background: url('../images/reza.jpg');
+  background: url('../images/shayne.jpg');
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -1180,11 +1181,11 @@ ul.portfolio-image li .desc{
   transform: translateY(100%);
 }
 
-.facebook{
+.mastodon{
   background: #969696;
   /*padding: 20px 0;*/
 }
-.facebook a:after{
+.mastodon a:after{
   background-color: #527bbb;
 }
 .twitter{
