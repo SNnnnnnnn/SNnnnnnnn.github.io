@@ -224,34 +224,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Wallabag Q&amp;A</title>
-    <url>/ap-20240217-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214238178.png" alt="Cover" title=" "></p>
-<hr>
-<h2 id="手动部署完成后，访问服务页面错乱"><a href="#手动部署完成后，访问服务页面错乱" class="headerlink" title="手动部署完成后，访问服务页面错乱"></a>手动部署完成后，访问服务页面错乱</h2><p>通过 <code>git clone</code> 手动部署 Wallabag(版本 v2.6.8，不排除其他版本也存在该问题)完成，安装时，因文件夹 <code>wallassets</code> 及其下文件缺失，导致页面错乱。</p>
-<p>解决：</p>
-<ul>
-<li><p>访问 <code>https://github.com/wallabag/wallabag/releases</code> 下载对应 Wallabag 版本 <code>wallabag-x.x.x.tar.gz</code> 压缩文件，并解压文件。</p>
-</li>
-<li><p>将目录 <code>web/wallassets</code> 及其下文件复制到目录 <code>/var/www/wallabag/web/</code> 下。</p>
-</li>
-<li><p>变更目录所有者及权限：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R www-data:www-data /var/www/wallabag</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /var/www/wallabag</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<p><strong>Update 2024&#x2F;02&#x2F;20:</strong> 今天在 <span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span> 通过 Docker 部署 Wallabag 出现了同样的问题现象，但通过修改配置文件 <code>./root/etc/wallabag/parameters.template.yml</code> 中参数 <code>domain_name</code> 中的域名为发布域名，并重新部署启动后，该问题现象解决。</p>
-<p>在手动部署时，已多次排查配置文件 <code>./app/config/parameters.yml</code> 中各个参数，包括参数 <code>domain_name</code> 所配置的域名，均正确，初步怀疑是由于反向代理或端口转发造成。</p>
-<p>所以若出现该问题现象，优先检查配置文件中各参数是否配置正确，若无问题，再通过替换文件的方式解决。</p>
-]]></content>
-      <categories>
-        <category>爱啪啪</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Q&amp;A</tag>
-        <tag>Wallabag</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux 部署 YAPI</title>
     <url>/ap-20230720-aaaaa/</url>
     <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214527616.png" alt="Cover" title=" "></p>
@@ -316,6 +288,34 @@
       </tags>
   </entry>
   <entry>
+    <title>Wallabag Q&amp;A</title>
+    <url>/ap-20240217-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214238178.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="手动部署完成后，访问服务页面错乱"><a href="#手动部署完成后，访问服务页面错乱" class="headerlink" title="手动部署完成后，访问服务页面错乱"></a>手动部署完成后，访问服务页面错乱</h2><p>通过 <code>git clone</code> 手动部署 Wallabag(版本 v2.6.8，不排除其他版本也存在该问题)完成，安装时，因文件夹 <code>wallassets</code> 及其下文件缺失，导致页面错乱。</p>
+<p>解决：</p>
+<ul>
+<li><p>访问 <code>https://github.com/wallabag/wallabag/releases</code> 下载对应 Wallabag 版本 <code>wallabag-x.x.x.tar.gz</code> 压缩文件，并解压文件。</p>
+</li>
+<li><p>将目录 <code>web/wallassets</code> 及其下文件复制到目录 <code>/var/www/wallabag/web/</code> 下。</p>
+</li>
+<li><p>变更目录所有者及权限：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R www-data:www-data /var/www/wallabag</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /var/www/wallabag</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>Update 2024&#x2F;02&#x2F;20:</strong> 今天在 <span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span> 通过 Docker 部署 Wallabag 出现了同样的问题现象，但通过修改配置文件 <code>./root/etc/wallabag/parameters.template.yml</code> 中参数 <code>domain_name</code> 中的域名为发布域名，并重新部署启动后，该问题现象解决。</p>
+<p>在手动部署时，已多次排查配置文件 <code>./app/config/parameters.yml</code> 中各个参数，包括参数 <code>domain_name</code> 所配置的域名，均正确，初步怀疑是由于反向代理或端口转发造成。</p>
+<p>所以若出现该问题现象，优先检查配置文件中各参数是否配置正确，若无问题，再通过替换文件的方式解决。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Q&amp;A</tag>
+        <tag>Wallabag</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Docker 安装 &amp; 配置 GoToSocial</title>
     <url>/ap-20240331-aaaaa/</url>
     <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240331181009324.png" alt="Cover"></p>
@@ -374,20 +374,6 @@
         <tag>Linux</tag>
         <tag>Docker</tag>
         <tag>GoToSocial</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>第一篇章</title>
-    <url>/li-20220503-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214324095.jpg" alt="Cover" title=" "></p>
-<hr>
-<p>想想，其实也只是简单的记录，记录烟火，记录气息，记录过往。</p>
-]]></content>
-      <categories>
-        <category>如戏</category>
-      </categories>
-      <tags>
-        <tag>百态</tag>
       </tags>
   </entry>
   <entry>
@@ -514,19 +500,17 @@
       </tags>
   </entry>
   <entry>
-    <title>威远，夜徒</title>
-    <url>/li-20231003-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214619907.png" alt="Cover" title=" "></p>
+    <title>第一篇章</title>
+    <url>/li-20220503-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214324095.jpg" alt="Cover" title=" "></p>
 <hr>
-<p>已不知的，继续回味的。</p>
+<p>想想，其实也只是简单的记录，记录烟火，记录气息，记录过往。</p>
 ]]></content>
       <categories>
         <category>如戏</category>
       </categories>
       <tags>
         <tag>百态</tag>
-        <tag>故乡</tag>
-        <tag>威远</tag>
       </tags>
   </entry>
   <entry>
@@ -576,6 +560,22 @@
       <tags>
         <tag>百态</tag>
         <tag>歌曲</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>威远，夜徒</title>
+    <url>/li-20231003-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214619907.png" alt="Cover" title=" "></p>
+<hr>
+<p>已不知的，继续回味的。</p>
+]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+        <tag>故乡</tag>
+        <tag>威远</tag>
       </tags>
   </entry>
 </search>
