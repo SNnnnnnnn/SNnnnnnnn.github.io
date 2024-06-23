@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-yin.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-yin.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-yin.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="hY-0XaRAuX7K3GDlcGkof1fFu4okXprzGLP_wtGSwUE">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+SC:300,300italic,400,400italic,700,700italic%7CLobster+Two:300,300italic,400,400italic,700,700italic%7CEB+Garamond:300,300italic,400,400italic,700,700italic%7CSource+Code+Pro:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.33/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.ishayne.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.19.1","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="应用部署大迁移...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="应用迁移“翻新”">
+<meta property="og:url" content="https://blog.ishayne.com/ap-20240229-aaaaa/">
+<meta property="og:site_name" content="隐亦逍遥">
+<meta property="og:description" content="应用部署大迁移...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://assets.ishayne.com/ShareX/20240229153610828.png">
+<meta property="og:image" content="https://assets.ishayne.com/ShareX/20240229154558730.png">
+<meta property="og:image" content="https://assets.ishayne.com/ShareX/20240229154217383.png">
+<meta property="article:published_time" content="2024-02-29T02:00:44.000Z">
+<meta property="article:modified_time" content="2024-02-29T16:05:31.866Z">
+<meta property="article:author" content="Shayne">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="PaaS">
+<meta property="article:tag" content="Hexo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://assets.ishayne.com/ShareX/20240229153610828.png">
+
+
+<link rel="canonical" href="https://blog.ishayne.com/ap-20240229-aaaaa/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.ishayne.com/ap-20240229-aaaaa/","path":"ap-20240229-aaaaa/","title":"应用迁移“翻新”"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>应用迁移“翻新” | 隐亦逍遥</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="waline.ishayne.com">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">隐亦逍遥</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Serverless-Pass-Others"><span class="nav-number">1.</span> <span class="nav-text">Serverless &amp; Pass &amp; Others</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Vercel"><span class="nav-number">1.1.</span> <span class="nav-text">Vercel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Render"><span class="nav-number">1.2.</span> <span class="nav-text">Render</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deta-Space"><span class="nav-number">1.3.</span> <span class="nav-text">Deta Space</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Surge"><span class="nav-number">1.4.</span> <span class="nav-text">Surge</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Netlify"><span class="nav-number">1.5.</span> <span class="nav-text">Netlify</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RunKit"><span class="nav-number">1.6.</span> <span class="nav-text">RunKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fly-io"><span class="nav-number">1.7.</span> <span class="nav-text">Fly.io</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Glitch"><span class="nav-number">1.8.</span> <span class="nav-text">Glitch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Koyeb"><span class="nav-number">1.9.</span> <span class="nav-text">Koyeb</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Application"><span class="nav-number">2.</span> <span class="nav-text">Application</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hexo-NexT-Waline"><span class="nav-number">2.1.</span> <span class="nav-text">Hexo &amp; NexT &amp; Waline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memos"><span class="nav-number">2.2.</span> <span class="nav-text">Memos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tiny-Tiny-RSS"><span class="nav-number">2.3.</span> <span class="nav-text">Tiny Tiny RSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RSSHub"><span class="nav-number">2.4.</span> <span class="nav-text">RSSHub</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Wallabag"><span class="nav-number">2.5.</span> <span class="nav-text">Wallabag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gotify"><span class="nav-number">2.6.</span> <span class="nav-text">Gotify</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Uptime-Kuma"><span class="nav-number">2.7.</span> <span class="nav-text">Uptime Kuma</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AList"><span class="nav-number">2.8.</span> <span class="nav-text">AList</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Others"><span class="nav-number">2.9.</span> <span class="nav-text">Others</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Shayne"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Shayne</p>
+  <div class="site-description" itemprop="description">潜龙勿用</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOndhbmdoYW54aWFuQG91dGxvb2suY29t" title="E-Mail → mailto:wanghanxian@outlook.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9tYXN0b2Rvbi5zb2NpYWwvQFJhbllp" title="Mastodon → https:&#x2F;&#x2F;mastodon.social&#x2F;@RanYi"><i class="fa-brands fa-mastodon fa-fw"></i>Mastodon</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9tZW1vcy5pc2hheW5lLmNvbQ==" title="Memos → https:&#x2F;&#x2F;memos.ishayne.com"><i class="fa fa-pen fa-fw"></i>Memos</span>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.ishayne.com/ap-20240229-aaaaa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Shayne">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="隐亦逍遥">
+      <meta itemprop="description" content="潜龙勿用">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="应用迁移“翻新” | 隐亦逍遥">
+      <meta itemprop="description" content="应用部署大迁移...">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          应用迁移“翻新”
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-29 10:00:44" itemprop="dateCreated datePublished" datetime="2024-02-29T10:00:44+08:00">2024-02-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-03-01 00:05:31" itemprop="dateModified" datetime="2024-03-01T00:05:31+08:00">2024-03-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%88%B1%E5%95%AA%E5%95%AA/" itemprop="url" rel="index"><span itemprop="name">爱啪啪</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/ap-20240229-aaaaa/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/ap-20240229-aaaaa/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>9 分钟</span>
+    </span>
+</div>
+
+            <div class="post-description">应用部署大迁移...</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="https://assets.ishayne.com/ShareX/20240229153610828.png" alt="Cover" title=" "></p>
+<hr>
+<p>早几年前，就有过更换博客框架的想法，但总会因为一些原因搁置。春节后，有了一些时间，于是一颗“邪心”又开始蠢蠢欲动，打起了更换博客框架的想法。过程中因为博客评论系统了解到一些关于 Serverless 和 PaaS 的信息，然后就开始了 RSSHub、 Tiny Tiny RSS、 Wallabag 等应用迁移与部署之一去不回头之路，哪能想到原来这是牵一发而动全身的事情，怪我意志不够坚定咯。</p>
+<p>说说更换博客框架的原因，当初搭建博客并没有参考太多的信息，就是那么一下在 GitHub 发现了一个博客模板的仓库，就突发奇想，动手也搞一个自己的博客。你所想不到的是，那就是一个模板，只有一个 html 的静态模板，所有样式、脚本、文章等，全在那一个页面上。复杂、易错、杂乱，导致在尝新之后其实很少更新内容。</p>
+<h2 id="Serverless-Pass-Others"><a href="#Serverless-Pass-Others" class="headerlink" title="Serverless &amp; Pass &amp; Others"></a>Serverless &amp; Pass &amp; Others</h2><blockquote>
+<p>Serverless computing is a cloud computing execution model in which the cloud provider allocates machine resources on demand, taking care of the servers on behalf of their customers. “Serverless” is a misnomer in the sense that servers are still used by cloud service providers to execute code for developers. However, developers of serverless applications are not concerned with capacity planning, configuration, management, maintenance, fault tolerance, or scaling of containers, VMs, or physical servers. Serverless computing does not hold resources in volatile memory; computing is rather done in short bursts with the results persisted to storage. When an app is not in use, there are no computing resources allocated to the app. Pricing is based on the actual amount of resources consumed by an application. It can be a form of utility computing.</p>
+<p>Serverless computing can simplify the process of deploying code into production. Serverless code can be used in conjunction with code deployed in traditional styles, such as microservices or monoliths. Alternatively, applications can be written to be purely serverless and use no provisioned servers at all. This should not be confused with computing or networking models that do not require an actual server to function, such as peer-to-peer (P2P).</p>
+<p><strong>Serverless computing</strong> – Wikipedia</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Platform as a service (PaaS) or application platform as a service (aPaaS) or platform-based service is a category of cloud computing services that allows customers to provision, instantiate, run, and manage a modular bundle comprising a computing platform and one or more applications, without the complexity of building and maintaining the infrastructure typically associated with developing and launching the application(s), and to allow developers to create, develop, and package such software bundles.</p>
+<p><strong>Platform as a service</strong> – Wikipedia</p>
+</blockquote>
+<p>为什么先说这些，因为它们算是我开启新世界大门的罪魁祸首。</p>
+<p>在搭建博客前，选择了 Waline 作为博客的评论系统，而部署 Waline 的容器，各个面都指向了 Vercel。在初识 Vercel 时，无非就让我关注到了两点：<br>1、还有哪些类似的服务<br>2、它能部署一些什么  </p>
+<p>说到类似的服务，真是寻觅了一圈又一圈，尝试了一轮又一轮：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly92ZXJjZWwuY29tLw==">Vercel<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9kZXRhLnNwYWNlLw==">Deta Space<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9zdXJnZS5zaC8=">Surge<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubmV0bGlmeS5jb20v">Netlify<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ydW5raXQuY29tLw==">RunKit<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9mbHkuaW8v">Fly.io<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9nbGl0Y2guY29tLw==">Glitch<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cua295ZWIuY29tLw==">Koyeb<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+<h3 id="Vercel"><a href="#Vercel" class="headerlink" title="Vercel"></a>Vercel</h3><p>认识下来，算是一个应用很广泛的 Serverless，在国内使用的缺点就不再赘述。就个人对其需求不大。</p>
+<p>目前在 Vercel 部署的服务就两项：</p>
+<ul>
+<li>RSSHub</li>
+<li>Excalidraw</li>
+</ul>
+<h3 id="Render"><a href="#Render" class="headerlink" title="Render"></a>Render</h3><p>目前个人使用最多的 PaaS。在 Render 上，基本都是以 Docker 部署应用， 对免费计划而言，限制还是挺多的：</p>
+<ul>
+<li>所有应用每月总共 750 小时在线时长</li>
+<li>无持久化存储</li>
+<li>15分钟内无访问休眠</li>
+</ul>
+<p>目前在 Render 部署的应用：</p>
+<ul>
+<li>Tiny Tiny RSS</li>
+<li>Wallabag</li>
+<li>Gotify</li>
+<li>AList</li>
+<li>Uptime Kuma</li>
+<li>Cloudreve</li>
+<li>Zfile</li>
+</ul>
+<h3 id="Deta-Space"><a href="#Deta-Space" class="headerlink" title="Deta Space"></a>Deta Space</h3><p>在使用前，其实对 Deta Space 抱有很大的期望，可能真的是希望越大，失落越大，失落的是没有申请到开发者权限，故失去了很多自定义的乐趣。</p>
+<p>目前在 Deta Space 部署的应用：</p>
+<ul>
+<li>Waline</li>
+<li>WebCrate</li>
+<li>Snapdrop</li>
+</ul>
+<h3 id="Surge"><a href="#Surge" class="headerlink" title="Surge"></a>Surge</h3><p>目前博客就部署在 Surge 上，Surge 算是比较出名的静态站点托管平台，不像其他大多数平台，它没有每月流量限制，但最近通过 Uptime Kuma 监控访问发现，Surge 的服务器很不稳，不知只是最近的问题，还是长期都存在的问题，如果长期不稳，会考虑将博客迁出。</p>
+<p>目前在 Surge 部署的应用：</p>
+<ul>
+<li>Hexo Blog</li>
+</ul>
+<h3 id="Netlify"><a href="#Netlify" class="headerlink" title="Netlify"></a>Netlify</h3><p>也是一个出名的静态站点部署平台，但目前对其需求不大。</p>
+<p>目前在 Netlify 部署的应用：</p>
+<ul>
+<li>Acme-h5</li>
+<li>Webp2jpg</li>
+</ul>
+<h3 id="RunKit"><a href="#RunKit" class="headerlink" title="RunKit"></a>RunKit</h3><p>尝试了下，但目前没有使用场景，也观察了下，算是很多人都喜欢的一个 Serverless 平台。</p>
+<h3 id="Fly-io"><a href="#Fly-io" class="headerlink" title="Fly.io"></a>Fly.io</h3><p>风评很好的 PaaS， 但部署需要绑定信用卡，它在限制我将它发扬光大。</p>
+<h3 id="Glitch"><a href="#Glitch" class="headerlink" title="Glitch"></a>Glitch</h3><p>尝试部署了几个项目，算是一个好玩的 PaaS，除了会休眠，它的机制玩法，也会让我觉得只能玩玩。</p>
+<h3 id="Koyeb"><a href="#Koyeb" class="headerlink" title="Koyeb"></a>Koyeb</h3><p>怎么说呢，它也算是一款知名的 PaaS，本来申请 Koyeb 是用来作为备用或备选，但是它的校验机制特别逆天，反正目前我仍被它拒绝中，考虑删号走人。</p>
+<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><h3 id="Hexo-NexT-Waline"><a href="#Hexo-NexT-Waline" class="headerlink" title="Hexo &amp; NexT &amp; Waline"></a>Hexo &amp; NexT &amp; Waline</h3><p>之前博客模板采用单一 html 的形式部署，每次新增、修改都有可能导致页面错乱。且长期更新之后，内容叠加，使得单一页面内容以较为复杂，所以一直有更换博客框架的想法。</p>
+<p>其实在早前，已经了解过 Hexo，但人生最悲哀的事情莫过于人懒，所以迟迟未动。</p>
+<p>正所谓好事不出门，“坏事”传千里，Hexo 作为博客搭建框架应算是人尽皆知的。选定 Hexo 作为博客框架，又选了 NexT 主题，要问为啥，因为好看、便捷、使用量高，其实还是人懒，深究不了。为方便考虑，选择了 Waline 作为评论应用。</p>
+<p>目前博客部署于 Surge，Waline 部署于 Deta Space（没错，它没有部署在 Vercel）。</p>
+<h3 id="Memos"><a href="#Memos" class="headerlink" title="Memos"></a>Memos</h3><p><img src="https://assets.ishayne.com/ShareX/20240229154558730.png" alt="img" title=" "></p>
+<p>一款类私人微博应用，方便记录、备忘，主要用于随感随记。</p>
+<p>部署 Memos 时，稍微折腾了一段时间，最初是想尝试下，所以将其部署到 Render 上，为避免 Render 因免费计划未持久化存储，导致数据清除，所以选择了 SQLPub 作为 MySQL 数据库平台存储数据。但在使用几天后，效果并不理想，一是因为远程连接数据库，导致操作及页面加载过慢；二是因为考虑到数据安全及隐私问题，所以最终放弃了在 Render 上部署。</p>
+<p>目前 Memos 部署于云服务器。</p>
+<h3 id="Tiny-Tiny-RSS"><a href="#Tiny-Tiny-RSS" class="headerlink" title="Tiny Tiny RSS"></a>Tiny Tiny RSS</h3><p>一款 RSS 订阅应用，主要订阅一些个人平时关注的文章及新闻，如 <code>One 一个</code>、<code>小众软件</code> 等。</p>
+<p>Tiny Tiny RSS 早前一直部署在我的爱机 Pixel2 上，但由于目前 Pixel2 上部署的应用越来越多，且磁盘空间有限，遂将其迁移到 Render 上，但还是因为连接远程数据库的原因，其实效率相比之前有所降低。</p>
+<p>目前 TTRSS 部署于 Render。</p>
+<h3 id="RSSHub"><a href="#RSSHub" class="headerlink" title="RSSHub"></a>RSSHub</h3><p>提到了 Tiny Tiny RSS，也不得不提 RSSHub，一款 RSS Feed 生成器，主要是把一些网站内容转换成 RSS 格式，然后订阅到 Tiny Tiny RSS 中。</p>
+<p>RSSHub 之前也部署在爱机 Pixel2 上，由于同上类似的原因，将其另行迁移。</p>
+<p>目前 RSSHub 部署于 Vercel。</p>
+<h3 id="Wallabag"><a href="#Wallabag" class="headerlink" title="Wallabag"></a>Wallabag</h3><p>记得 Pocket 作为稍后阅读的元老级产品，刚推出时，便吸引了一大堆<strong>我认为我有时间，我认为我爱阅读</strong>的一大批人。当然，我也是那批人中的一个，管你产品是不是稍后阅读，到我这儿，就只有稍后，没有了阅读。</p>
+<p>每次打开 Pocket 总会看到推荐订阅付费计划，其实让我感官不是很舒服。我有点时间看看零碎收藏，你就让我首先看这？于是乎便有了 Pocket 的私人部署替代 Wallabag。</p>
+<p>Wallabag 之前同样部署在爱机 Pixel2 上。问：为什么要部署那么多应用到 Pixel2 上？答：因为是爱机…当然现在已经迁移了。</p>
+<p>目前 Wallabag 部署于 Render。</p>
+<h3 id="Gotify"><a href="#Gotify" class="headerlink" title="Gotify"></a>Gotify</h3><p>本人手机在使用过 iPhone6s Plus 后，便投入了 Andorid 的怀抱，不是 iPhone 不好，是我不够好。</p>
+<p>话还是说回 Gotify，一款安卓平台的消息实时推送应用。Gotify Server 早前部署在家里的 NAS 上，然后想想，NAS 主要是运行 Nextcloud、Emby、Calibre-Web 那些资源大项上的，Gotify 嘛，动动嘛，所以动动就动动。</p>
+<p>目前 Gotify 部署于 Render。</p>
+<h3 id="Uptime-Kuma"><a href="#Uptime-Kuma" class="headerlink" title="Uptime Kuma"></a>Uptime Kuma</h3><p><img src="https://assets.ishayne.com/ShareX/20240229154217383.png" alt="img" title=" "></p>
+<p>Uptime Kuma 是类 Uptime Robot 的网站及服务器监控应用。使用它的目的在于：</p>
+<ol>
+<li>监控已部署应用并通过调用 Gotify API 进行通知。</li>
+<li>定时访问 Render 部署应用，解决其机制性休眠。</li>
+</ol>
+<p>目前 Uptime Kuma 部署于 Render（以子之矛，攻子之盾？）。</p>
+<h3 id="AList"><a href="#AList" class="headerlink" title="AList"></a>AList</h3><blockquote>
+<p>A file list program that supports multiple storage, and supports web browsing and webdav, powered by gin and Solidjs.</p>
+<p><strong>AList</strong> – AList Docs</p>
+</blockquote>
+<p>如其描述那样，将你能想到，不能想到的网盘、WebDAV 聚合到 AList 中，实在是方便，而且其花活也多，自行研究。</p>
+<p>AList 在 NAS、个人常用笔记本中都有部署，然后配置了已在使用的所有网盘。也是因为配置了所有网盘，所以仅在家里的网络和本机使用。同时也在云服务器上部署过配置部分网盘的 AList，但由于流量及硬件限制，在使用上一直不怎么理想，所以也在考虑如何迁出。</p>
+<p>目前 AList 部署于 Render。</p>
+<p>Render 部署 AList 期间，发现要么其 Docker 镜像不能部署，要么部署的 Docker 镜像在一段时间后会被 Render 自动删除，应该是其 Docker 镜像被 Render 官方注意并加入黑名单。目前部署的 AList Docker 镜像是下载 AList 官方仓库后自行构建上传的，截至当前仍然使用正常，后续仍需监控，且行且珍惜，对，说的就是你 Render，要珍惜我。</p>
+<h3 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h3><p>其他应用的部署算是实验性的，使用频率并不会如以上应用那么高，所以也不过多献丑。</p>
+<p>最后，本文算是近期为自己应用迁移做一个小结。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Shayne
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.ishayne.com/ap-20240229-aaaaa/" title="应用迁移“翻新”">https://blog.ishayne.com/ap-20240229-aaaaa/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Serverless/" rel="tag"># Serverless</a>
+              <a href="/tags/PaaS/" rel="tag"># PaaS</a>
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ap-20240217-aaaaa/" rel="prev" title="Wallabag Q&A">
+                  <i class="fa fa-angle-left"></i> Wallabag Q&A
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/ap-20240331-aaaaa/" rel="next" title="Docker 安装 & 配置 GoToSocial">
+                  Docker 安装 & 配置 GoToSocial <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2021 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Shayne</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">7k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">25 分钟</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.33/fancybox/fancybox.umd.js" integrity="sha256-+2+qOqR8CKoHh/AsVR9k2qaDBKWjYNC2nozhYmv5j9k=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline.ishayne.com","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"发表评论","avatar":"mm","meta":["nick","mail"],"pageSize":10,"visitor":false,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/ap-20240229-aaaaa/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

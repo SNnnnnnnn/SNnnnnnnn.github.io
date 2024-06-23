@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Linux-CentOS 安装及配置 Oracle 服务器端</title>
+    <url>/ap-20220503-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214446884.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
+<li><p><strong>版本</strong></p>
+<p>  Oracle 11gR2</p>
+</li>
+<li><p><strong>下载</strong></p>
+<p>  通过官网链接 ，下载 Oracle， 下载地址如下：</p>
+<p>  <code>http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html?spm=a2c4e.11153940.blogcont566703.10.36ae6c23iChOrf</code></p>
+<p>  下载文件包括：<code>linux.x64_11gR2_database_1of2.zip</code> 及 <code>linux.x64_11gR2_database_2of2.zip</code> 两个文件。</p>
+</li>
+<li><p><strong>检查</strong></p>
+<ol>
+<li><p>查看操作系统版本：</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">cat</span> /etc/redhat-release</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看内核版本：</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">uname</span> -r</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看系统内存大小(oracle 11g官方建议物理内存在2G以上)：</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">cat</span> /proc/meminfo | grep MemTotal</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>检查防火墙：</p>
+<p> 查看防火墙状态</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemctl status firewalld</span> </span><br></pre></td></tr></table></figure>
+
+<p> 关闭防火墙</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemctl stop firewalld</span></span><br></pre></td></tr></table></figure>
+
+<p> 关闭自启动</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemctl is-enabled firewalld</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemctl <span class="built_in">disable</span> firewalld</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemctl is-enabled firewalld</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关闭selinux：</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sed -i <span class="string">&#x27;s#SELINUX=enforcing#SELINUX=disabled#g&#x27;</span> /etc/sysconfig/selinux</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">setenforce 0</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装相关依赖包：</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">yum -y install binutils compat-libstdc++-33 compat-libcap1 gcc gcc-c++ glibc glibc-devel ksh libgcc libstdc++ libstdc++-devel libaio libaio-devel make elfutils-libelf-devel sysstat</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置&#x2F;dev&#x2F;shm空间：</p>
+<p> 修改文件 <code>/etc/fstab</code></p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/fstab</span></span><br></pre></td></tr></table></figure>
+
+<p> 在文件末尾追加内容</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">shmfs                     /dev/shm            tmpfs   size=7g         0 0</span><br></pre></td></tr></table></figure>
+
+<p> 执行一下命令</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">mount -a</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">df</span> -Th</span> </span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li><p><strong>用户创建</strong></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/usr/sbin/groupadd oinstall</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/usr/sbin/groupadd dba</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/usr/sbin/groupadd asmadmin</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/usr/sbin/groupadd asmdba</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/usr/sbin/useradd -g oinstall -G dba,asmdba oracle -d /home/oracle</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">id</span> oracle</span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">passwd oracle</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>内核参数调整</strong></p>
+<p>  编辑文件 <code>/etc/sysctl.conf</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/sysctl.conf</span></span><br></pre></td></tr></table></figure>
+
+<p>  在文件末尾追加以下内容</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">kernel.shmall = 2097152</span><br><span class="line">kernel.shmmax = 4294967295</span><br><span class="line">kernel.shmmni = 4096</span><br><span class="line">kernel.sem = 250 32000 100 128</span><br><span class="line">fs.file-max = 6553600</span><br><span class="line">net.ipv4.ip_local_port_range = 1024 65000</span><br><span class="line">net.core.rmem_default = 4194304</span><br><span class="line">net.core.rmem_max = 4194304</span><br><span class="line">net.core.wmem_default = 262144</span><br><span class="line">net.core.wmem_max = 262144</span><br></pre></td></tr></table></figure>
+
+<p>  重载配置信息</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sysctl -p</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>shell 限制新增</strong></p>
+<p>  编辑文件 <code>/etc/security/limits.conf</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/security/limits.conf</span></span><br></pre></td></tr></table></figure>
+
+<p>  追加内容如下</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">oracle   soft    nproc    2047</span><br><span class="line">oracle   hard    nproc    16384</span><br><span class="line">oracle   soft    nofile     1024</span><br><span class="line">oracle   hard    nofile    65536</span><br><span class="line">oracle   soft    stack    10240</span><br><span class="line">oracle   hard   stack    10240</span><br></pre></td></tr></table></figure>
+
+<p>  编辑文件 <code>/etc/pam.d/login</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/pam.d/login</span></span><br></pre></td></tr></table></figure>
+
+<p>  追加内容如下</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">session   required    /lib/security/pam_limits.so</span><br><span class="line">session   required    pam_limits.so</span><br></pre></td></tr></table></figure>
+
+<p>  编辑文件 <code>/etc/profile</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/profile</span></span><br></pre></td></tr></table></figure>
+
+<p>  追加内容如下</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if [ $USER = &quot;oracle&quot; ]; then</span><br><span class="line">  if [ $SHELL = &quot;/bin/ksh&quot; ]; then</span><br><span class="line">     ulimit -p 16384</span><br><span class="line">     ulimit -n 65536</span><br><span class="line">  else</span><br><span class="line">     ulimit -u 16384 -n 65536</span><br><span class="line">  fi</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>创建安装目录及赋权</strong></p>
+<p>  创建安装目录 <code>/home/app/oracle/</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">mkdir</span> -p /home/app/oracle/</span></span><br></pre></td></tr></table></figure>
+
+<p>  授权操作</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R oracle:oinstall /home/app/</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /home/app/</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R oracle:oinstall /home/oracle</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 775 /home/oracle</span></span><br></pre></td></tr></table></figure>
+
+<p>  配置 <code>/etc/hosts</code> 文件</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi /etc/hosts</span></span><br></pre></td></tr></table></figure>
+
+<p>  末尾添加以下内容</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">192.168.187.130     oracle</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置 oracle 用户的环境变量</strong></p>
+<p>  切换到 <code>oracle</code> 用户</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">su - oracle</span></span><br></pre></td></tr></table></figure>
+
+<p>  编辑环境变量文件 <code>~/.bash_profile</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi ~/.bash_profile</span></span><br></pre></td></tr></table></figure>
+
+<p>  追加如下内容</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ORACLE_HOSTNAME=oracle</span><br><span class="line">export ORACLE_UNQNAME=orcl</span><br><span class="line">export ORACLE_BASE=/home/app/oracle</span><br><span class="line">export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/</span><br><span class="line">export ORACLE_SID=ORCL</span><br><span class="line">export PATH=/usr/sbin:$PATH</span><br><span class="line">export PATH=$ORACLE_HOME/bin:$PATH</span><br><span class="line">export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib</span><br><span class="line">export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib</span><br><span class="line">export NLS_LANG=AMERICAN_AMERICA.ZHS16GBK</span><br><span class="line">export TMP=/tmp</span><br><span class="line">export TMPDIR=$TMP</span><br><span class="line">umask 022</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>解压 oracle 安装文件</strong></p>
+<p>  执行以下命令解压 oracle 安装文件</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">unzip linux.x64_11gR2_database_1of2.zip</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">unzip linux.x64_11gR2_database_2of2.zip</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>修改响应文件</strong></p>
+<p>  创建存放 oracle 安装配置文件目录 <code>scripts</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">mkdir</span> scripts</span></span><br></pre></td></tr></table></figure>
+
+<p>  复制配置文件至 <code>scripts</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">cp</span> -R database/response/ scripts/</span></span><br></pre></td></tr></table></figure>
+
+<p>  修改配置文件 <code>scripts/response/db_install.rsp</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi scripts/response/db_install.rsp</span></span><br></pre></td></tr></table></figure>
+
+<p>  将以下参数进行修改、设置</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">oracle.install.option=INSTALL_DB_SWONLY</span><br><span class="line">ORACLE_HOSTNAME=oracle</span><br><span class="line">UNIX_GROUP_NAME=oinstall</span><br><span class="line">INVENTORY_LOCATION=/home/app/oracle/oraInventory</span><br><span class="line">SELECTED_LANGUAGES=en,zh_CN</span><br><span class="line">ORACLE_HOME=/home/app/oracle/product/11.2.0</span><br><span class="line">ORACLE_BASE=/home/app/oracle</span><br><span class="line">oracle.install.db.InstallEdition=EE</span><br><span class="line">oracle.install.db.isCustomInstall=true</span><br><span class="line">oracle.install.db.DBA_GROUP=dba</span><br><span class="line">oracle.install.db.OPER_GROUP=oinstall</span><br><span class="line">oracle.install.db.config.starterdb.type=GENERAL_PURPOSE</span><br><span class="line">oracle.install.db.config.starterdb.globalDBName=ORCL</span><br><span class="line">oracle.install.db.config.starterdb.SID=ORCL</span><br><span class="line">oracle.install.db.config.starterdb.characterSet=ZHS16GBK</span><br><span class="line">oracle.install.db.config.starterdb.memoryOption=true</span><br><span class="line">oracle.install.db.config.starterdb.installExampleSchemas=false</span><br><span class="line">oracle.install.db.config.starterdb.enableSecuritySettings=true</span><br><span class="line">oracle.install.db.config.starterdb.password.ALL=oracle</span><br><span class="line">oracle.install.db.config.starterdb.control=DB_CONTROL</span><br><span class="line">oracle.install.db.config.starterdb.dbcontrol.enableEmailNotification=false</span><br><span class="line">oracle.install.db.config.starterdb.automatedBackup.enable=false</span><br><span class="line">oracle.install.db.config.starterdb.dbcontrol.emailAddress=myoracle@msn.com</span><br><span class="line">DECLINE_SECURITY_UPDATES=true</span><br></pre></td></tr></table></figure>
+
+<p>  修改后 <code>db_install.rsp</code> 文件内容如下：</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">####################################################################</span><br><span class="line">## Copyright(c) Oracle Corporation 1998,2008. All rights reserved.##</span><br><span class="line">##                                                                ##</span><br><span class="line">## Specify values for the variables listed below to customize     ##</span><br><span class="line">## your installation.                                             ##</span><br><span class="line">##                                                                ##</span><br><span class="line">## Each variable is associated with a comment. The comment        ##</span><br><span class="line">## can help to populate the variables with the appropriate        ##</span><br><span class="line">## values.                                                        ##</span><br><span class="line">##                                                                ##</span><br><span class="line">## IMPORTANT NOTE: This file contains plain text passwords and    ##</span><br><span class="line">## should be secured to have read permission only by oracle user  ##</span><br><span class="line">## or db administrator who owns this installation.                ##</span><br><span class="line">##                                                                ##</span><br><span class="line">####################################################################</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Do not change the following system generated value. </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.responseFileVersion=/oracle/install/rspfmt_dbinstall_response_schema_v11_2_0</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the installation option.</span><br><span class="line"># It can be one of the following:</span><br><span class="line"># 1. INSTALL_DB_SWONLY</span><br><span class="line"># 2. INSTALL_DB_AND_CONFIG</span><br><span class="line"># 3. UPGRADE_DB</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.option=INSTALL_DB_SWONLY</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the hostname of the system as set during the install. It can be used</span><br><span class="line"># to force the installation to use an alternative hostname rather than using the</span><br><span class="line"># first hostname found on the system. (e.g., for systems with multiple hostnames </span><br><span class="line"># and network interfaces)</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">ORACLE_HOSTNAME=oracle</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the Unix group to be set for the inventory directory.  </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">UNIX_GROUP_NAME=oinstall</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the location which holds the inventory files.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">INVENTORY_LOCATION=/home/app/oracle/oraInventory</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the languages in which the components will be installed.             </span><br><span class="line">#</span><br><span class="line"># en   : English                  ja   : Japanese                  </span><br><span class="line"># fr   : French                   ko   : Korean                    </span><br><span class="line"># ar   : Arabic                   es   : Latin American Spanish    </span><br><span class="line"># bn   : Bengali                  lv   : Latvian                   </span><br><span class="line"># pt_BR: Brazilian Portuguese     lt   : Lithuanian                </span><br><span class="line"># bg   : Bulgarian                ms   : Malay                     </span><br><span class="line"># fr_CA: Canadian French          es_MX: Mexican Spanish           </span><br><span class="line"># ca   : Catalan                  no   : Norwegian                 </span><br><span class="line"># hr   : Croatian                 pl   : Polish                    </span><br><span class="line"># cs   : Czech                    pt   : Portuguese                </span><br><span class="line"># da   : Danish                   ro   : Romanian                  </span><br><span class="line"># nl   : Dutch                    ru   : Russian                   </span><br><span class="line"># ar_EG: Egyptian                 zh_CN: Simplified Chinese        </span><br><span class="line"># en_GB: English (Great Britain)  sk   : Slovak                    </span><br><span class="line"># et   : Estonian                 sl   : Slovenian                 </span><br><span class="line"># fi   : Finnish                  es_ES: Spanish                   </span><br><span class="line"># de   : German                   sv   : Swedish                   </span><br><span class="line"># el   : Greek                    th   : Thai                      </span><br><span class="line"># iw   : Hebrew                   zh_TW: Traditional Chinese       </span><br><span class="line"># hu   : Hungarian                tr   : Turkish                   </span><br><span class="line"># is   : Icelandic                uk   : Ukrainian                 </span><br><span class="line"># in   : Indonesian               vi   : Vietnamese                </span><br><span class="line"># it   : Italian                                                   </span><br><span class="line">#</span><br><span class="line"># Example : SELECTED_LANGUAGES=en,fr,ja</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">SELECTED_LANGUAGES=en,zh_CN</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the complete path of the Oracle Home.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">ORACLE_HOME=/home/app/oracle/product/11.2.0</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the complete path of the Oracle Base. </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">ORACLE_BASE=/home/app/oracle</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the installation edition of the component.                        </span><br><span class="line">#                                                             </span><br><span class="line"># The value should contain only one of these choices.        </span><br><span class="line"># EE     : Enterprise Edition                                </span><br><span class="line"># SE     : Standard Edition                                  </span><br><span class="line"># SEONE  : Standard Edition One</span><br><span class="line"># PE     : Personal Edition (WINDOWS ONLY)</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.InstallEdition=EE</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable is used to enable or disable custom install.</span><br><span class="line">#</span><br><span class="line"># true  : Components mentioned as part of &#x27;customComponents&#x27; property</span><br><span class="line">#         are considered for install.</span><br><span class="line"># false : Value for &#x27;customComponents&#x27; is not considered.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.isCustomInstall=true</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable is considered only if &#x27;IsCustomInstall&#x27; is set to true. </span><br><span class="line">#</span><br><span class="line"># Description: List of Enterprise Edition Options you would like to install.</span><br><span class="line">#</span><br><span class="line">#              The following choices are available. You may specify any</span><br><span class="line">#              combination of these choices.  The components you choose should</span><br><span class="line">#              be specified in the form &quot;internal-component-name:version&quot;</span><br><span class="line">#              Below is a list of components you may specify to install.</span><br><span class="line">#        </span><br><span class="line">#              oracle.rdbms.partitioning:11.2.0.1.0 - Oracle Partitioning</span><br><span class="line">#              oracle.rdbms.dm:11.2.0.1.0 - Oracle Data Mining</span><br><span class="line">#              oracle.rdbms.dv:11.2.0.1.0 - Oracle Database Vault </span><br><span class="line">#              oracle.rdbms.lbac:11.2.0.1.0 - Oracle Label Security</span><br><span class="line">#              oracle.rdbms.rat:11.2.0.1.0 - Oracle Real Application Testing </span><br><span class="line">#              oracle.oraolap:11.2.0.1.0 - Oracle OLAP</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.customComponents=oracle.server:11.2.0.1.0,oracle.sysman.ccr:10.2.7.0.0,oracle.xdk:11.2.0.1.0,oracle.rdbms.oci:11.2.0.1.0,oracle.network:11.2.0.1.0,oracle.network.listener:11.2.0.1.0,oracle.rdbms:11.2.0.1.0,oracle.options:11.2.0.1.0,oracle.rdbms.partitioning:11.2.0.1.0,oracle.oraolap:11.2.0.1.0,oracle.rdbms.dm:11.2.0.1.0,oracle.rdbms.dv:11.2.0.1.0,orcle.rdbms.lbac:11.2.0.1.0,oracle.rdbms.rat:11.2.0.1.0</span><br><span class="line"></span><br><span class="line">###############################################################################</span><br><span class="line">#                                                                             #</span><br><span class="line"># PRIVILEGED OPERATING SYSTEM GROUPS                                          #</span><br><span class="line"># ------------------------------------------                                  #</span><br><span class="line"># Provide values for the OS groups to which OSDBA and OSOPER privileges       #</span><br><span class="line"># needs to be granted. If the install is being performed as a member of the   #</span><br><span class="line"># group &quot;dba&quot;, then that will be used unless specified otherwise below.       #</span><br><span class="line">#                                                                             #</span><br><span class="line">###############################################################################</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># The DBA_GROUP is the OS group which is to be granted OSDBA privileges.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.DBA_GROUP=dba</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># The OPER_GROUP is the OS group which is to be granted OSOPER privileges.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.OPER_GROUP=oinstall</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the cluster node names selected during the installation.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.CLUSTER_NODES=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the type of database to create.</span><br><span class="line"># It can be one of the following:</span><br><span class="line"># - GENERAL_PURPOSE/TRANSACTION_PROCESSING          </span><br><span class="line"># - DATA_WAREHOUSE                                </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.type=GENERAL_PURPOSE</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the Starter Database Global Database Name. </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.globalDBName=ORCL</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the Starter Database SID.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.SID=ORCL</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the Starter Database character set.</span><br><span class="line">#                                              </span><br><span class="line"># It can be one of the following:</span><br><span class="line"># AL32UTF8, WE8ISO8859P15, WE8MSWIN1252, EE8ISO8859P2,</span><br><span class="line"># EE8MSWIN1250, NE8ISO8859P10, NEE8ISO8859P4, BLT8MSWIN1257,</span><br><span class="line"># BLT8ISO8859P13, CL8ISO8859P5, CL8MSWIN1251, AR8ISO8859P6,</span><br><span class="line"># AR8MSWIN1256, EL8ISO8859P7, EL8MSWIN1253, IW8ISO8859P8,</span><br><span class="line"># IW8MSWIN1255, JA16EUC, JA16EUCTILDE, JA16SJIS, JA16SJISTILDE,</span><br><span class="line"># KO16MSWIN949, ZHS16GBK, TH8TISASCII, ZHT32EUC, ZHT16MSWIN950,</span><br><span class="line"># ZHT16HKSCS, WE8ISO8859P9, TR8MSWIN1254, VN8MSWIN1258</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.characterSet=ZHS16GBK</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable should be set to true if Automatic Memory Management </span><br><span class="line"># in Database is desired.</span><br><span class="line"># If Automatic Memory Management is not desired, and memory allocation</span><br><span class="line"># is to be done manually, then set it to false.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.memoryOption=true</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the total memory allocation for the database. Value(in MB) should be</span><br><span class="line"># at least 256 MB, and should not exceed the total physical memory available </span><br><span class="line"># on the system.</span><br><span class="line"># Example: oracle.install.db.config.starterdb.memoryLimit=512</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.memoryLimit=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable controls whether to load Example Schemas onto the starter</span><br><span class="line"># database or not.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.installExampleSchemas=false</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable includes enabling audit settings, configuring password profiles</span><br><span class="line"># and revoking some grants to public. These settings are provided by default. </span><br><span class="line"># These settings may also be disabled.    </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.enableSecuritySettings=true</span><br><span class="line"></span><br><span class="line">###############################################################################</span><br><span class="line">#                                                                             #</span><br><span class="line"># Passwords can be supplied for the following four schemas in the             #</span><br><span class="line"># starter database:                                                           #</span><br><span class="line">#   SYS                                                                       #</span><br><span class="line">#   SYSTEM                                                                    #</span><br><span class="line">#   SYSMAN (used by Enterprise Manager)                                       #</span><br><span class="line">#   DBSNMP (used by Enterprise Manager)                                       #</span><br><span class="line">#                                                                             #</span><br><span class="line"># Same password can be used for all accounts (not recommended)                #</span><br><span class="line"># or different passwords for each account can be provided (recommended)       #</span><br><span class="line">#                                                                             #</span><br><span class="line">###############################################################################</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable holds the password that is to be used for all schemas in the</span><br><span class="line"># starter database.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.password.ALL=oracle</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the SYS password for the starter database.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.password.SYS=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the SYSTEM password for the starter database.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.password.SYSTEM=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the SYSMAN password for the starter database.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.password.SYSMAN=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the DBSNMP password for the starter database.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.password.DBSNMP=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the management option to be selected for the starter database. </span><br><span class="line"># It can be one of the following:</span><br><span class="line"># 1. GRID_CONTROL</span><br><span class="line"># 2. DB_CONTROL</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.control=DB_CONTROL</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the Management Service to use if Grid Control is selected to manage </span><br><span class="line"># the database.      </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.gridcontrol.gridControlServiceURL=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># This variable indicates whether to receive email notification for critical </span><br><span class="line"># alerts when using DB control.   </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.dbcontrol.enableEmailNotification=false</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the email address to which the notifications are to be sent.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.dbcontrol.emailAddress=myoracle@msn.com</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the SMTP server used for email notifications.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.dbcontrol.SMTPServer=</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">###############################################################################</span><br><span class="line">#                                                                             #</span><br><span class="line"># SPECIFY BACKUP AND RECOVERY OPTIONS                                         #</span><br><span class="line"># ------------------------------------                                        #</span><br><span class="line"># Out-of-box backup and recovery options for the database can be mentioned    #</span><br><span class="line"># using the entries below.                                                    #</span><br><span class="line">#                                                                             #</span><br><span class="line">###############################################################################</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># This variable is to be set to false if automated backup is not required. Else </span><br><span class="line"># this can be set to true.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.automatedBackup.enable=false</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Regardless of the type of storage that is chosen for backup and recovery, if </span><br><span class="line"># automated backups are enabled, a job will be scheduled to run daily at</span><br><span class="line"># 2:00 AM to backup the database. This job will run as the operating system </span><br><span class="line"># user that is specified in this variable.</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.automatedBackup.osuid=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Regardless of the type of storage that is chosen for backup and recovery, if </span><br><span class="line"># automated backups are enabled, a job will be scheduled to run daily at</span><br><span class="line"># 2:00 AM to backup the database. This job will run as the operating system user</span><br><span class="line"># specified by the above entry. The following entry stores the password for the</span><br><span class="line"># above operating system user.</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.automatedBackup.ospwd=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the type of storage to use for the database.</span><br><span class="line"># It can be one of the following:</span><br><span class="line"># - FILE_SYSTEM_STORAGE</span><br><span class="line"># - ASM_STORAGE</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.storageType=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the database file location which is a directory for datafiles, control</span><br><span class="line"># files, redo logs.         </span><br><span class="line">#</span><br><span class="line"># Applicable only when oracle.install.db.config.starterdb.storage=FILE_SYSTEM </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.fileSystemStorage.dataLocation=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the backup and recovery location.</span><br><span class="line">#</span><br><span class="line"># Applicable only when oracle.install.db.config.starterdb.storage=FILE_SYSTEM </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.starterdb.fileSystemStorage.recoveryLocation=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the existing ASM disk groups to be used for storage.</span><br><span class="line">#</span><br><span class="line"># Applicable only when oracle.install.db.config.starterdb.storage=ASM</span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.asm.diskGroup=</span><br><span class="line"></span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line"># Specify the password for ASMSNMP user of the ASM instance.                  </span><br><span class="line">#</span><br><span class="line"># Applicable only when oracle.install.db.config.starterdb.storage=ASM_SYSTEM </span><br><span class="line">#-------------------------------------------------------------------------------</span><br><span class="line">oracle.install.db.config.asm.ASMSNMPPassword=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the My Oracle Support Account Username.</span><br><span class="line">#</span><br><span class="line">#  Example   : MYORACLESUPPORT_USERNAME=metalink</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">MYORACLESUPPORT_USERNAME=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the My Oracle Support Account Username password.</span><br><span class="line">#</span><br><span class="line"># Example    : MYORACLESUPPORT_PASSWORD=password</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">MYORACLESUPPORT_PASSWORD=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify whether to enable the user to set the password for</span><br><span class="line"># My Oracle Support credentials. The value can be either true or false.</span><br><span class="line"># If left blank it will be assumed to be false.</span><br><span class="line">#</span><br><span class="line"># Example    : SECURITY_UPDATES_VIA_MYORACLESUPPORT=true</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">SECURITY_UPDATES_VIA_MYORACLESUPPORT=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify whether user wants to give any proxy details for connection. </span><br><span class="line"># The value can be either true or false. If left blank it will be assumed</span><br><span class="line"># to be false.</span><br><span class="line">#</span><br><span class="line"># Example    : DECLINE_SECURITY_UPDATES=false</span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">DECLINE_SECURITY_UPDATES=true</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the Proxy server name. Length should be greater than zero.</span><br><span class="line">#</span><br><span class="line"># Example    : PROXY_HOST=proxy.domain.com </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">PROXY_HOST=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the proxy port number. Should be Numeric and atleast 2 chars.</span><br><span class="line">#</span><br><span class="line"># Example    : PROXY_PORT=25 </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">PROXY_PORT=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the proxy user name. Leave PROXY_USER and PROXY_PWD </span><br><span class="line"># blank if your proxy server requires no authentication.</span><br><span class="line">#</span><br><span class="line"># Example    : PROXY_USER=username </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">PROXY_USER=</span><br><span class="line"></span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line"># Specify the proxy password. Leave PROXY_USER and PROXY_PWD  </span><br><span class="line"># blank if your proxy server requires no authentication.</span><br><span class="line">#</span><br><span class="line"># Example    : PROXY_PWD=password </span><br><span class="line">#------------------------------------------------------------------------------</span><br><span class="line">PROXY_PWD=</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>静默安装</strong></p>
+<p>  通过以下命令完成静默安装</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">./runInstaller -silent -responseFile /home/oracle/scripts/response/db_install.rsp -ignorePrereq</span></span><br></pre></td></tr></table></figure>
+
+<p>  提示以下信息表示安装完成</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span> </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">Root scripts to run</span></span><br><span class="line"></span><br><span class="line">/home/app/oracle/oraInventory/orainstRoot.sh</span><br><span class="line">/home/app/oracle/product/11.2.0/root.sh</span><br><span class="line">To execute the configuration scripts:</span><br><span class="line">     1. Open a terminal window </span><br><span class="line">     2. Log in as &quot;root&quot; </span><br><span class="line">     3. Run the scripts </span><br><span class="line">     4. Return to this window and hit &quot;Enter&quot; key to continue </span><br><span class="line"></span><br><span class="line">Successfully Setup Software.</span><br></pre></td></tr></table></figure>
+
+<p>  切换到 root 用户</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">su root</span></span><br></pre></td></tr></table></figure>
+
+<p>  执行以下命令</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sh /home/app/oracle/oraInventory/orainstRoot.sh</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sh /home/app/oracle/product/11.2.0/root.sh</span></span><br></pre></td></tr></table></figure>
+
+<p>  安装 libXext</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">yum install libXext -y</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置静默监听</strong></p>
+<p>  设置 <code>DISPLAY</code> 环境变量</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">export DISPLAY=192.168.187.130:0.0</span><br></pre></td></tr></table></figure>
+
+<p>  通过 <code>response</code> 文件运行 <code>netca</code>, 生成 <code>sqlnet.ora</code> 和 <code>listener.ora</code> 文件，生成文件位于 <code>$ORACLE_HOME/network/admin</code> 目录下</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">netca -silent -responsefile /home/oracle/scripts/response/netca.rsp</span></span><br></pre></td></tr></table></figure>
+
+<p>  修改文件 <code>$ORACLE_HOME/network/admin/listener.ora</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi <span class="variable">$ORACLE_HOME</span>/network/admin/listener.ora</span></span><br></pre></td></tr></table></figure>
+
+<p>  在 <code>LISTEN</code> 属性后添加以下内容：</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SID_LIST_LISTENER =</span><br><span class="line">(SID_LIST =</span><br><span class="line">  (SID_DESC =</span><br><span class="line">  (GLOBAL_DBNAME = ORCL)</span><br><span class="line">  (SID_NAME = ORCL)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>  重新加载监听</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">lsnrctl reload</span></span><br></pre></td></tr></table></figure>
+
+<p>  查看监听端口是否正常启动</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">netstat -tnlp</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>静默建库</strong></p>
+<p>  修改文件 <code>/home/oracle/scripts/response/dbca.rsp</code>：</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">vi  /home/oracle/scripts/response/dbca.rsp</span></span><br></pre></td></tr></table></figure>
+
+<p>  修改内容如下：</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SID = &quot;ORCL&quot;</span><br></pre></td></tr></table></figure>
+
+<p>  执行以下命令，开始静默建库</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">dbca -silent -responseFile  /home/oracle/scripts/response/dbca.rsp</span></span><br></pre></td></tr></table></figure>
+
+<p>  分别输入创建 <code>sys</code> 及 <code>system</code> 用户密码</p>
+<p>  重启服务器后，连接到 oracle</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sqlplus / as sysdba</span></span><br></pre></td></tr></table></figure>
+
+<p>  启动数据库</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">SQL&gt; </span><span class="language-bash">startup;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="字符集修改"><a href="#字符集修改" class="headerlink" title="字符集修改"></a>字符集修改</h3><ul>
+<li><p><strong>修改服务端数据库字符集</strong></p>
+<ul>
+<li><p>查询目前数据库所使用的字符集</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> V$NLS_PARAMETERS;</span><br></pre></td></tr></table></figure>
+
+<p>其中查询结果中 “NLS_CHARACTERSET” 的值即为目前所使用的字符集，若字符集需要调整，则按照以下步骤操作</p>
+</li>
+<li><p>连接到服务器数据库</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># sqlplus <span class="operator">/</span> <span class="keyword">as</span> sysdba</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关闭数据库</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> shutdown immediate;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进入限制模式</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> startup mount;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> <span class="keyword">ALTER</span> <span class="keyword">SYSTEM</span> ENABLE RESTRICTED SESSION;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> <span class="keyword">ALTER</span> <span class="keyword">SYSTEM</span> <span class="keyword">SET</span> JOB_QUEUE_PROCESSES<span class="operator">=</span><span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> <span class="keyword">ALTER</span> <span class="keyword">SYSTEM</span> <span class="keyword">SET</span> AQ_TM_PROCESSES<span class="operator">=</span><span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> <span class="keyword">alter</span> database <span class="keyword">open</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改字符集</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> <span class="keyword">ALTER</span> DATABASE <span class="type">character</span> <span class="keyword">set</span> INTERNAL_USE ZHS16GBK;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重启数据库</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> shutdown immediate;</span><br><span class="line"><span class="keyword">SQL</span><span class="operator">&gt;</span> startup;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Oracle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Wallabag Q&amp;A</title>
+    <url>/ap-20240217-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214238178.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="手动部署完成后，访问服务页面错乱"><a href="#手动部署完成后，访问服务页面错乱" class="headerlink" title="手动部署完成后，访问服务页面错乱"></a>手动部署完成后，访问服务页面错乱</h2><p>通过 <code>git clone</code> 手动部署 Wallabag(版本 v2.6.8，不排除其他版本也存在该问题)完成，安装时，因文件夹 <code>wallassets</code> 及其下文件缺失，导致页面错乱。</p>
+<p>解决：</p>
+<ul>
+<li><p>访问 <code>https://github.com/wallabag/wallabag/releases</code> 下载对应 Wallabag 版本 <code>wallabag-x.x.x.tar.gz</code> 压缩文件，并解压文件。</p>
+</li>
+<li><p>将目录 <code>web/wallassets</code> 及其下文件复制到目录 <code>/var/www/wallabag/web/</code> 下。</p>
+</li>
+<li><p>变更目录所有者及权限：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R www-data:www-data /var/www/wallabag</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /var/www/wallabag</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>Update 2024&#x2F;02&#x2F;20:</strong> 今天在 <span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span> 通过 Docker 部署 Wallabag 出现了同样的问题现象，但通过修改配置文件 <code>./root/etc/wallabag/parameters.template.yml</code> 中参数 <code>domain_name</code> 中的域名为发布域名，并重新部署启动后，该问题现象解决。</p>
+<p>在手动部署时，已多次排查配置文件 <code>./app/config/parameters.yml</code> 中各个参数，包括参数 <code>domain_name</code> 所配置的域名，均正确，初步怀疑是由于反向代理或端口转发造成。</p>
+<p>所以若出现该问题现象，优先检查配置文件中各参数是否配置正确，若无问题，再通过替换文件的方式解决。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Q&amp;A</tag>
+        <tag>Wallabag</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux 部署 YAPI</title>
+    <url>/ap-20230720-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214527616.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li>搭建 YApi 前需安装 <code>nodejs</code> 建议安装版本 12.x，高版本搭建时会出现异常</li>
+<li>搭建前需安装 <code>MongoDB</code>，根据 linux 发行版自行安装<ul>
+<li><p><code>MongoDB</code> 启动命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongod --logpath=/data/logs --fork</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>创建安装主目录，并进入该目录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkdir yapi</span><br><span class="line">cd yapi</span><br></pre></td></tr></table></figure>
+
+<p>克隆项目到目录 <code>vendors</code> 下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone git@git.i:shayne/yapi.git vendors</span><br></pre></td></tr></table></figure>
+
+<p>将项目下的配置文件实例，复制到 <code>yapi</code> 主目录下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp vendors/config_example.json ./config.json</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>请根据情况，修改 <code>config.json</code> 配置信息：<br>port 默认端口 <code>3000</code><br>closeRegister 禁止用户通过系统自行注册<br>adminAccount 管理员账户，初始化使用<br>包括数据库连接信息，db.user、 db.pass、 db.authSource 为 “”（空字符）即可</p>
+</blockquote>
+<p>修改安装源信息为淘宝源，并进行 yapi 安装</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install --production --registry https://registry.npm.taobao.org</span><br><span class="line">npm run install-server</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>安装程序会初始化数据库索引和管理员账号，管理员账号名可在 config.json 配置<br>安装初始化完成后，控制台中会显示帐号信息，包括帐号及密码</p>
+</blockquote>
+<p>启动 yapi</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">node server/app.js</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul>
+<li><p>原版本在关闭注册及为使用 LDAP 时无法创建新用户，以上安装版本已修改为可通过工具调用新增用户 API 版本：<br>  <code>POST</code><br>  <code>Headers</code> : 传输 <code>Cookie</code> 参数<br>  <code>BODY</code> : <code>JSON</code>,</p>
+  <figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span><span class="string">&quot;name@domain.com&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span><span class="string">&quot;pwd&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>原版本中用户很多主要信息不能修改，包括邮箱，权限等，可通过后台连接 <code>MongoDB</code> 进行修改：<br>  连接 <code>MongoDB</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongo</span><br></pre></td></tr></table></figure>
+
+<p>  进入 <code>yapi</code> 数据库</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">use yapi</span><br></pre></td></tr></table></figure>
+
+<p>  通过帐号或邮箱查询用户 <code>id</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;username&quot;:&quot;acc&quot;&#125;)</span><br><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;email&quot;:&quot;email@domain.com&quot;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>  根据返回的 <code>id</code> 对用户权限或其他信息进行修改</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).update(&#123;&quot;_id&quot;:2&#125;, &#123;$set: &#123;&quot;role&quot;:&quot;admin&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>提示<br>权限说明： admin 为管理员权限，member 为会员权限</p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>YAPI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker 安装 &amp; 配置 GoToSocial</title>
+    <url>/ap-20240331-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240331181009324.png" alt="Cover"></p>
+<hr>
+<h2 id="GoToSocial-是啥"><a href="#GoToSocial-是啥" class="headerlink" title="GoToSocial 是啥"></a>GoToSocial 是啥</h2><blockquote>
+<p>GoToSocial 是用 Golang 编写的 ActivityPub 社交网络服务器。GoToSocial 为 Fediverse 提供了一个轻量级、可定制和注重安全的入口。通过 GoToSocial，您可以与朋友保持联系，发布、阅读和分享图片和文章。所有这一切都不会被跟踪或广告！</p>
+</blockquote>
+<p>以上白话就是，它是一款可私有部署的类微博应用。</p>
+<h2 id="选择理由"><a href="#选择理由" class="headerlink" title="选择理由"></a>选择理由</h2><ul>
+<li>项目搭建练手</li>
+<li>部署对软硬件环境要求较低</li>
+<li>日常生活、工作等事件记录及分享</li>
+<li>数据可控</li>
+<li>避免非正常数据监管</li>
+<li>对比 Memos，可与其他支持 ActivityPub 联邦服务器联通，用户之间可直接关注，而非系统孤岛</li>
+<li>多系统，多平台 Web 及客户端支持</li>
+</ul>
+<h2 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h2><ul>
+<li>服务器</li>
+<li>数据库 Postgres</li>
+<li>域名</li>
+</ul>
+<h2 id="Docker-安装-GoToSocial"><a href="#Docker-安装-GoToSocial" class="headerlink" title="Docker 安装 GoToSocial"></a>Docker 安装 GoToSocial</h2><p>数据库安装、配置及域名解析、反代不过多介绍，先掠过。</p>
+<p>首先，下载镜像文件</p>
+<p><strong>镜像文件</strong>： <code>docker pull superseriousbusiness/gotosocial:latest</code></p>
+<p>创建环境变量文件 <code>gotosocial.env</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/docker/env/gotosocial.env</span><br></pre></td></tr></table></figure>
+
+<p>添加以下环境变量内容，相关环境变量需根据个人实际情况调整</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">GTS_HOST</span>=domain.com</span><br><span class="line"><span class="attr">GTS_DB_TYPE</span>=postgres</span><br><span class="line"><span class="attr">GTS_DB_ADDRESS</span>=dbhost</span><br><span class="line"><span class="attr">GTS_DB_PORT</span>=<span class="number">5432</span></span><br><span class="line"><span class="attr">GTS_DB_DATABASE</span>=dbbase</span><br><span class="line"><span class="attr">GTS_DB_USER</span>=dbuser</span><br><span class="line"><span class="attr">GTS_DB_PASSWORD</span>=dbpwd</span><br><span class="line"><span class="attr">GTS_LETSENCRYPT_ENABLED</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">GTS_STORAGE_BACKEND</span>=s3</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_BUCKET</span>=s3bucket</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ENDPOINT</span>=s3endpoiont</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ACCESS_KEY</span>=s3acckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_SECRET_KEY</span>=s3seckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_PROXY</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">TZ</span>=Asia/Chongqing</span><br></pre></td></tr></table></figure>
+
+<p><code>GTS_HOST</code>: 应用访问域名<br><code>GTS_STORAGE_BACKEND</code>：资源存储方式，包括 <code>local</code> 及 <code>s3</code>，<code>local</code> 为本地存储；<code>s3</code> 为对象存储，支持 Amazon S3、Cloudflare R2、minio 等<br><code>GTS_STORAGE_S3_PROXY</code>： 使用对象存储时配置为 <code>true</code>， 使用本地存储时配置为 <code>false</code><br><code>TZ</code>: 时区配置</p>
+<h2 id="Docker-启动-GoToSocial"><a href="#Docker-启动-GoToSocial" class="headerlink" title="Docker 启动 GoToSocial"></a>Docker 启动 GoToSocial</h2><p>相关准备完成后，则以 Docker 启动：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d --restart always --name gotosocial --env-file /etc/docker/env/gotosocial.env -p 443:8080 superseriousbusiness/gotosocial:latest</span><br></pre></td></tr></table></figure>
+
+<p>通过已解析的域名 <code>https://domain.com</code> 访问</p>
+<p><img src="https://assets.ishayne.com/ShareX/20240331181059237.png" alt="img"></p>
+<p>出现以上类似界面，则安装成功。</p>
+<h2 id="其他说明"><a href="#其他说明" class="headerlink" title="其他说明"></a>其他说明</h2><h3 id="用户创建"><a href="#用户创建" class="headerlink" title="用户创建"></a>用户创建</h3><p>目前 GoToSocial 仍处于开发阶段，前端无用户注册、创建页面及功能，需要在后台完成用户创建</p>
+<p><strong>创建用户</strong>命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account create --username uname --email u@email.com --password upwd</span><br></pre></td></tr></table></figure>
+
+<p><code>uname</code> 用户名<br><code>u@email.com</code> 邮箱<br><code>upwd</code> 密码  </p>
+<p><strong>确认用户</strong>命令，激活用户使其可登录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account confirm --username uname</span><br></pre></td></tr></table></figure>
+
+<p><strong>授权用户</strong>命令，授予用户管理员权限</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account promote --username uname</span><br></pre></td></tr></table></figure>
+
+<p>访问域名 <code>https://domain.com/settings</code> ，登录并进行相关配置。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
+        <tag>GoToSocial</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>第一篇章</title>
+    <url>/li-20220503-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214324095.jpg" alt="Cover" title=" "></p>
+<hr>
+<p>想想，其实也只是简单的记录，记录烟火，记录气息，记录过往。</p>
+]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>应用迁移“翻新”</title>
+    <url>/ap-20240229-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240229153610828.png" alt="Cover" title=" "></p>
+<hr>
+<p>早几年前，就有过更换博客框架的想法，但总会因为一些原因搁置。春节后，有了一些时间，于是一颗“邪心”又开始蠢蠢欲动，打起了更换博客框架的想法。过程中因为博客评论系统了解到一些关于 Serverless 和 PaaS 的信息，然后就开始了 RSSHub、 Tiny Tiny RSS、 Wallabag 等应用迁移与部署之一去不回头之路，哪能想到原来这是牵一发而动全身的事情，怪我意志不够坚定咯。</p>
+<p>说说更换博客框架的原因，当初搭建博客并没有参考太多的信息，就是那么一下在 GitHub 发现了一个博客模板的仓库，就突发奇想，动手也搞一个自己的博客。你所想不到的是，那就是一个模板，只有一个 html 的静态模板，所有样式、脚本、文章等，全在那一个页面上。复杂、易错、杂乱，导致在尝新之后其实很少更新内容。</p>
+<h2 id="Serverless-Pass-Others"><a href="#Serverless-Pass-Others" class="headerlink" title="Serverless &amp; Pass &amp; Others"></a>Serverless &amp; Pass &amp; Others</h2><blockquote>
+<p>Serverless computing is a cloud computing execution model in which the cloud provider allocates machine resources on demand, taking care of the servers on behalf of their customers. “Serverless” is a misnomer in the sense that servers are still used by cloud service providers to execute code for developers. However, developers of serverless applications are not concerned with capacity planning, configuration, management, maintenance, fault tolerance, or scaling of containers, VMs, or physical servers. Serverless computing does not hold resources in volatile memory; computing is rather done in short bursts with the results persisted to storage. When an app is not in use, there are no computing resources allocated to the app. Pricing is based on the actual amount of resources consumed by an application. It can be a form of utility computing.</p>
+<p>Serverless computing can simplify the process of deploying code into production. Serverless code can be used in conjunction with code deployed in traditional styles, such as microservices or monoliths. Alternatively, applications can be written to be purely serverless and use no provisioned servers at all. This should not be confused with computing or networking models that do not require an actual server to function, such as peer-to-peer (P2P).</p>
+<p><strong>Serverless computing</strong> – Wikipedia</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Platform as a service (PaaS) or application platform as a service (aPaaS) or platform-based service is a category of cloud computing services that allows customers to provision, instantiate, run, and manage a modular bundle comprising a computing platform and one or more applications, without the complexity of building and maintaining the infrastructure typically associated with developing and launching the application(s), and to allow developers to create, develop, and package such software bundles.</p>
+<p><strong>Platform as a service</strong> – Wikipedia</p>
+</blockquote>
+<p>为什么先说这些，因为它们算是我开启新世界大门的罪魁祸首。</p>
+<p>在搭建博客前，选择了 Waline 作为博客的评论系统，而部署 Waline 的容器，各个面都指向了 Vercel。在初识 Vercel 时，无非就让我关注到了两点：<br>1、还有哪些类似的服务<br>2、它能部署一些什么  </p>
+<p>说到类似的服务，真是寻觅了一圈又一圈，尝试了一轮又一轮：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly92ZXJjZWwuY29tLw==">Vercel<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9kZXRhLnNwYWNlLw==">Deta Space<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9zdXJnZS5zaC8=">Surge<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cubmV0bGlmeS5jb20v">Netlify<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ydW5raXQuY29tLw==">RunKit<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9mbHkuaW8v">Fly.io<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9nbGl0Y2guY29tLw==">Glitch<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cua295ZWIuY29tLw==">Koyeb<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+<h3 id="Vercel"><a href="#Vercel" class="headerlink" title="Vercel"></a>Vercel</h3><p>认识下来，算是一个应用很广泛的 Serverless，在国内使用的缺点就不再赘述。就个人对其需求不大。</p>
+<p>目前在 Vercel 部署的服务就两项：</p>
+<ul>
+<li>RSSHub</li>
+<li>Excalidraw</li>
+</ul>
+<h3 id="Render"><a href="#Render" class="headerlink" title="Render"></a>Render</h3><p>目前个人使用最多的 PaaS。在 Render 上，基本都是以 Docker 部署应用， 对免费计划而言，限制还是挺多的：</p>
+<ul>
+<li>所有应用每月总共 750 小时在线时长</li>
+<li>无持久化存储</li>
+<li>15分钟内无访问休眠</li>
+</ul>
+<p>目前在 Render 部署的应用：</p>
+<ul>
+<li>Tiny Tiny RSS</li>
+<li>Wallabag</li>
+<li>Gotify</li>
+<li>AList</li>
+<li>Uptime Kuma</li>
+<li>Cloudreve</li>
+<li>Zfile</li>
+</ul>
+<h3 id="Deta-Space"><a href="#Deta-Space" class="headerlink" title="Deta Space"></a>Deta Space</h3><p>在使用前，其实对 Deta Space 抱有很大的期望，可能真的是希望越大，失落越大，失落的是没有申请到开发者权限，故失去了很多自定义的乐趣。</p>
+<p>目前在 Deta Space 部署的应用：</p>
+<ul>
+<li>Waline</li>
+<li>WebCrate</li>
+<li>Snapdrop</li>
+</ul>
+<h3 id="Surge"><a href="#Surge" class="headerlink" title="Surge"></a>Surge</h3><p>目前博客就部署在 Surge 上，Surge 算是比较出名的静态站点托管平台，不像其他大多数平台，它没有每月流量限制，但最近通过 Uptime Kuma 监控访问发现，Surge 的服务器很不稳，不知只是最近的问题，还是长期都存在的问题，如果长期不稳，会考虑将博客迁出。</p>
+<p>目前在 Surge 部署的应用：</p>
+<ul>
+<li>Hexo Blog</li>
+</ul>
+<h3 id="Netlify"><a href="#Netlify" class="headerlink" title="Netlify"></a>Netlify</h3><p>也是一个出名的静态站点部署平台，但目前对其需求不大。</p>
+<p>目前在 Netlify 部署的应用：</p>
+<ul>
+<li>Acme-h5</li>
+<li>Webp2jpg</li>
+</ul>
+<h3 id="RunKit"><a href="#RunKit" class="headerlink" title="RunKit"></a>RunKit</h3><p>尝试了下，但目前没有使用场景，也观察了下，算是很多人都喜欢的一个 Serverless 平台。</p>
+<h3 id="Fly-io"><a href="#Fly-io" class="headerlink" title="Fly.io"></a>Fly.io</h3><p>风评很好的 PaaS， 但部署需要绑定信用卡，它在限制我将它发扬光大。</p>
+<h3 id="Glitch"><a href="#Glitch" class="headerlink" title="Glitch"></a>Glitch</h3><p>尝试部署了几个项目，算是一个好玩的 PaaS，除了会休眠，它的机制玩法，也会让我觉得只能玩玩。</p>
+<h3 id="Koyeb"><a href="#Koyeb" class="headerlink" title="Koyeb"></a>Koyeb</h3><p>怎么说呢，它也算是一款知名的 PaaS，本来申请 Koyeb 是用来作为备用或备选，但是它的校验机制特别逆天，反正目前我仍被它拒绝中，考虑删号走人。</p>
+<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><h3 id="Hexo-NexT-Waline"><a href="#Hexo-NexT-Waline" class="headerlink" title="Hexo &amp; NexT &amp; Waline"></a>Hexo &amp; NexT &amp; Waline</h3><p>之前博客模板采用单一 html 的形式部署，每次新增、修改都有可能导致页面错乱。且长期更新之后，内容叠加，使得单一页面内容以较为复杂，所以一直有更换博客框架的想法。</p>
+<p>其实在早前，已经了解过 Hexo，但人生最悲哀的事情莫过于人懒，所以迟迟未动。</p>
+<p>正所谓好事不出门，“坏事”传千里，Hexo 作为博客搭建框架应算是人尽皆知的。选定 Hexo 作为博客框架，又选了 NexT 主题，要问为啥，因为好看、便捷、使用量高，其实还是人懒，深究不了。为方便考虑，选择了 Waline 作为评论应用。</p>
+<p>目前博客部署于 Surge，Waline 部署于 Deta Space（没错，它没有部署在 Vercel）。</p>
+<h3 id="Memos"><a href="#Memos" class="headerlink" title="Memos"></a>Memos</h3><p><img src="https://assets.ishayne.com/ShareX/20240229154558730.png" alt="img" title=" "></p>
+<p>一款类私人微博应用，方便记录、备忘，主要用于随感随记。</p>
+<p>部署 Memos 时，稍微折腾了一段时间，最初是想尝试下，所以将其部署到 Render 上，为避免 Render 因免费计划未持久化存储，导致数据清除，所以选择了 SQLPub 作为 MySQL 数据库平台存储数据。但在使用几天后，效果并不理想，一是因为远程连接数据库，导致操作及页面加载过慢；二是因为考虑到数据安全及隐私问题，所以最终放弃了在 Render 上部署。</p>
+<p>目前 Memos 部署于云服务器。</p>
+<h3 id="Tiny-Tiny-RSS"><a href="#Tiny-Tiny-RSS" class="headerlink" title="Tiny Tiny RSS"></a>Tiny Tiny RSS</h3><p>一款 RSS 订阅应用，主要订阅一些个人平时关注的文章及新闻，如 <code>One 一个</code>、<code>小众软件</code> 等。</p>
+<p>Tiny Tiny RSS 早前一直部署在我的爱机 Pixel2 上，但由于目前 Pixel2 上部署的应用越来越多，且磁盘空间有限，遂将其迁移到 Render 上，但还是因为连接远程数据库的原因，其实效率相比之前有所降低。</p>
+<p>目前 TTRSS 部署于 Render。</p>
+<h3 id="RSSHub"><a href="#RSSHub" class="headerlink" title="RSSHub"></a>RSSHub</h3><p>提到了 Tiny Tiny RSS，也不得不提 RSSHub，一款 RSS Feed 生成器，主要是把一些网站内容转换成 RSS 格式，然后订阅到 Tiny Tiny RSS 中。</p>
+<p>RSSHub 之前也部署在爱机 Pixel2 上，由于同上类似的原因，将其另行迁移。</p>
+<p>目前 RSSHub 部署于 Vercel。</p>
+<h3 id="Wallabag"><a href="#Wallabag" class="headerlink" title="Wallabag"></a>Wallabag</h3><p>记得 Pocket 作为稍后阅读的元老级产品，刚推出时，便吸引了一大堆<strong>我认为我有时间，我认为我爱阅读</strong>的一大批人。当然，我也是那批人中的一个，管你产品是不是稍后阅读，到我这儿，就只有稍后，没有了阅读。</p>
+<p>每次打开 Pocket 总会看到推荐订阅付费计划，其实让我感官不是很舒服。我有点时间看看零碎收藏，你就让我首先看这？于是乎便有了 Pocket 的私人部署替代 Wallabag。</p>
+<p>Wallabag 之前同样部署在爱机 Pixel2 上。问：为什么要部署那么多应用到 Pixel2 上？答：因为是爱机…当然现在已经迁移了。</p>
+<p>目前 Wallabag 部署于 Render。</p>
+<h3 id="Gotify"><a href="#Gotify" class="headerlink" title="Gotify"></a>Gotify</h3><p>本人手机在使用过 iPhone6s Plus 后，便投入了 Andorid 的怀抱，不是 iPhone 不好，是我不够好。</p>
+<p>话还是说回 Gotify，一款安卓平台的消息实时推送应用。Gotify Server 早前部署在家里的 NAS 上，然后想想，NAS 主要是运行 Nextcloud、Emby、Calibre-Web 那些资源大项上的，Gotify 嘛，动动嘛，所以动动就动动。</p>
+<p>目前 Gotify 部署于 Render。</p>
+<h3 id="Uptime-Kuma"><a href="#Uptime-Kuma" class="headerlink" title="Uptime Kuma"></a>Uptime Kuma</h3><p><img src="https://assets.ishayne.com/ShareX/20240229154217383.png" alt="img" title=" "></p>
+<p>Uptime Kuma 是类 Uptime Robot 的网站及服务器监控应用。使用它的目的在于：</p>
+<ol>
+<li>监控已部署应用并通过调用 Gotify API 进行通知。</li>
+<li>定时访问 Render 部署应用，解决其机制性休眠。</li>
+</ol>
+<p>目前 Uptime Kuma 部署于 Render（以子之矛，攻子之盾？）。</p>
+<h3 id="AList"><a href="#AList" class="headerlink" title="AList"></a>AList</h3><blockquote>
+<p>A file list program that supports multiple storage, and supports web browsing and webdav, powered by gin and Solidjs.</p>
+<p><strong>AList</strong> – AList Docs</p>
+</blockquote>
+<p>如其描述那样，将你能想到，不能想到的网盘、WebDAV 聚合到 AList 中，实在是方便，而且其花活也多，自行研究。</p>
+<p>AList 在 NAS、个人常用笔记本中都有部署，然后配置了已在使用的所有网盘。也是因为配置了所有网盘，所以仅在家里的网络和本机使用。同时也在云服务器上部署过配置部分网盘的 AList，但由于流量及硬件限制，在使用上一直不怎么理想，所以也在考虑如何迁出。</p>
+<p>目前 AList 部署于 Render。</p>
+<p>Render 部署 AList 期间，发现要么其 Docker 镜像不能部署，要么部署的 Docker 镜像在一段时间后会被 Render 自动删除，应该是其 Docker 镜像被 Render 官方注意并加入黑名单。目前部署的 AList Docker 镜像是下载 AList 官方仓库后自行构建上传的，截至当前仍然使用正常，后续仍需监控，且行且珍惜，对，说的就是你 Render，要珍惜我。</p>
+<h3 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h3><p>其他应用的部署算是实验性的，使用频率并不会如以上应用那么高，所以也不过多献丑。</p>
+<p>最后，本文算是近期为自己应用迁移做一个小结。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Serverless</tag>
+        <tag>PaaS</tag>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>威远，夜徒</title>
+    <url>/li-20231003-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214619907.png" alt="Cover" title=" "></p>
+<hr>
+<p>已不知的，继续回味的。</p>
+]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+        <tag>故乡</tag>
+        <tag>威远</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2024 贺新春</title>
+    <url>/li-20240209-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214644385.png" alt="Cover" title=" "></p>
+<hr>
+<p>心气神，钱运源。</p>
+]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+        <tag>春节</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>还记得的歌：明爱暗恋补习社</title>
+    <url>/li-20240216-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214414347.png" alt="Cover" title=" "></p>
+<hr>
+<iframe src="//music.163.com/outchain/player?type=2&id=1472304673&auto=1&height=66" width="330" height="86" frameborder="0" loading="lazy" allowfullscreen></iframe>
+
+<p>陪伴过的校园，陪伴过的暗恋。<br>陪伴过的夜车，陪伴过的会考。<br>陪伴过的孤寂，陪伴过的落寞。<br>陪伴过的香烟，陪伴过的眼泪。</p>
+<blockquote><p>作詞：黃偉文<br>作曲：伍樂城</p>
+<p>Ｇ：先生早 校長早 Ｃ＋Ｇ：各位早<br>Ｃ：誰共我研討 展開初戀的態度</p>
+<p>Ｇ：ＡＢ君誰又會 Ｃ＋Ｇ：待我最好？<br>Ｃ：談情可否當[代數]？</p>
+<p>Ｃ＋Ｇ：他七歲那天有多高？</p>
+<p>Ｇ：[歷史]可否看得到？</p>
+<p>Ｃ＋Ｇ：他的舞跳得有多好？</p>
+<p>Ｃ：[會計]科可會預計到？</p>
+<p>Ｃ＋Ｇ：問愛戀易學難精 可否惡補<br>然後你也會勸我 嬉戲別要那麼早<br>若愛戀亦是成人班必修一課<br>盼望能提前共我探討<br>坐下來陪我放瞻傾訴</p>
+<p>Ｇ：先生好 校長好 Ｃ＋Ｇ：各位好<br>Ｃ：來讓我 提早知多一點怎去做</p>
+<p>Ｇ：想跟他含著笑問句你好<br>Ｃ：台詞可否靠[電腦]？</p>
+<p>Ｃ＋Ｇ：給擁抱到底 有多好？</p>
+<p>Ｇ：[Bio]可否教得到？</p>
+<p>Ｃ＋Ｇ：給寵愛到底 有多好？</p>
+<p>Ｃ：[物理]科可會驗證到？</p>
+<p>Ｃ＋Ｇ：問愛戀易學難精 可否惡補<br>然後你也會勸我 嬉戲別要那麼早<br>若愛戀亦是成人班必修一課<br>盼望能提前共我探討<br>坐下來陪我放瞻傾訴</p>
+<p>Ｃ＋Ｇ：問愛戀易學難精 可否惡補<br>然後你也會勸我 嬉戲別要那麼早<br>若愛戀亦是成人班必修一課<br>盼望能提前共我探討<br>坐下來陪我放瞻傾訴</p>
+<p>Ｃ＋Ｇ：History gives me love<br>Chemistry gives me love<br>Biology gives me love<br>music gives me love<br>So let me feel what is love</p>
+<footer><strong>Twins</strong><cite>明愛暗戀補習社</cite></footer></blockquote>]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+        <tag>歌曲</tag>
+      </tags>
+  </entry>
+</search>
