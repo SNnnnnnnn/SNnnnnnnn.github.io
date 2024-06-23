@@ -119,28 +119,14 @@
 
   
   <url>
-    <loc>https://blog.ishayne.com/tags/Linux/</loc>
-    <lastmod>2024-06-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.ishayne.com/tags/Oracle/</loc>
-    <lastmod>2024-06-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.ishayne.com/tags/YAPI/</loc>
-    <lastmod>2024-06-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.ishayne.com/tags/Q-A/</loc>
+    <lastmod>2024-06-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.ishayne.com/tags/Linux/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -154,14 +140,14 @@
   </url>
   
   <url>
-    <loc>https://blog.ishayne.com/tags/Docker/</loc>
+    <loc>https://blog.ishayne.com/tags/YAPI/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://blog.ishayne.com/tags/GoToSocial/</loc>
+    <loc>https://blog.ishayne.com/tags/Oracle/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -196,14 +182,14 @@
   </url>
   
   <url>
-    <loc>https://blog.ishayne.com/tags/%E6%98%A5%E8%8A%82/</loc>
+    <loc>https://blog.ishayne.com/tags/Docker/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://blog.ishayne.com/tags/%E6%AD%8C%E6%9B%B2/</loc>
+    <loc>https://blog.ishayne.com/tags/GoToSocial/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -218,6 +204,20 @@
   
   <url>
     <loc>https://blog.ishayne.com/tags/%E5%A8%81%E8%BF%9C/</loc>
+    <lastmod>2024-06-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.ishayne.com/tags/%E6%98%A5%E8%8A%82/</loc>
+    <lastmod>2024-06-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.ishayne.com/tags/%E6%AD%8C%E6%9B%B2/</loc>
     <lastmod>2024-06-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

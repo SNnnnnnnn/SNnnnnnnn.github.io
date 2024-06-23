@@ -1,6 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Wallabag Q&amp;A</title>
+    <url>/ap-20240217-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214238178.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="手动部署完成后，访问服务页面错乱"><a href="#手动部署完成后，访问服务页面错乱" class="headerlink" title="手动部署完成后，访问服务页面错乱"></a>手动部署完成后，访问服务页面错乱</h2><p>通过 <code>git clone</code> 手动部署 Wallabag(版本 v2.6.8，不排除其他版本也存在该问题)完成，安装时，因文件夹 <code>wallassets</code> 及其下文件缺失，导致页面错乱。</p>
+<p>解决：</p>
+<ul>
+<li><p>访问 <code>https://github.com/wallabag/wallabag/releases</code> 下载对应 Wallabag 版本 <code>wallabag-x.x.x.tar.gz</code> 压缩文件，并解压文件。</p>
+</li>
+<li><p>将目录 <code>web/wallassets</code> 及其下文件复制到目录 <code>/var/www/wallabag/web/</code> 下。</p>
+</li>
+<li><p>变更目录所有者及权限：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R www-data:www-data /var/www/wallabag</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /var/www/wallabag</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>Update 2024&#x2F;02&#x2F;20:</strong> 今天在 <span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span> 通过 Docker 部署 Wallabag 出现了同样的问题现象，但通过修改配置文件 <code>./root/etc/wallabag/parameters.template.yml</code> 中参数 <code>domain_name</code> 中的域名为发布域名，并重新部署启动后，该问题现象解决。</p>
+<p>在手动部署时，已多次排查配置文件 <code>./app/config/parameters.yml</code> 中各个参数，包括参数 <code>domain_name</code> 所配置的域名，均正确，初步怀疑是由于反向代理或端口转发造成。</p>
+<p>所以若出现该问题现象，优先检查配置文件中各参数是否配置正确，若无问题，再通过替换文件的方式解决。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Q&amp;A</tag>
+        <tag>Linux</tag>
+        <tag>Wallabag</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux 部署 YAPI</title>
+    <url>/ap-20230720-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214527616.png" alt="Cover" title=" "></p>
+<hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li>搭建 YApi 前需安装 <code>nodejs</code> 建议安装版本 12.x，高版本搭建时会出现异常</li>
+<li>搭建前需安装 <code>MongoDB</code>，根据 linux 发行版自行安装<ul>
+<li><p><code>MongoDB</code> 启动命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongod --logpath=/data/logs --fork</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>创建安装主目录，并进入该目录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkdir yapi</span><br><span class="line">cd yapi</span><br></pre></td></tr></table></figure>
+
+<p>克隆项目到目录 <code>vendors</code> 下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone git@git.i:shayne/yapi.git vendors</span><br></pre></td></tr></table></figure>
+
+<p>将项目下的配置文件实例，复制到 <code>yapi</code> 主目录下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp vendors/config_example.json ./config.json</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>请根据情况，修改 <code>config.json</code> 配置信息：<br>port 默认端口 <code>3000</code><br>closeRegister 禁止用户通过系统自行注册<br>adminAccount 管理员账户，初始化使用<br>包括数据库连接信息，db.user、 db.pass、 db.authSource 为 “”（空字符）即可</p>
+</blockquote>
+<p>修改安装源信息为淘宝源，并进行 yapi 安装</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install --production --registry https://registry.npm.taobao.org</span><br><span class="line">npm run install-server</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>安装程序会初始化数据库索引和管理员账号，管理员账号名可在 config.json 配置<br>安装初始化完成后，控制台中会显示帐号信息，包括帐号及密码</p>
+</blockquote>
+<p>启动 yapi</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">node server/app.js</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul>
+<li><p>原版本在关闭注册及为使用 LDAP 时无法创建新用户，以上安装版本已修改为可通过工具调用新增用户 API 版本：<br>  <code>POST</code><br>  <code>Headers</code> : 传输 <code>Cookie</code> 参数<br>  <code>BODY</code> : <code>JSON</code>,</p>
+  <figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span><span class="string">&quot;name@domain.com&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span><span class="string">&quot;pwd&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>原版本中用户很多主要信息不能修改，包括邮箱，权限等，可通过后台连接 <code>MongoDB</code> 进行修改：<br>  连接 <code>MongoDB</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongo</span><br></pre></td></tr></table></figure>
+
+<p>  进入 <code>yapi</code> 数据库</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">use yapi</span><br></pre></td></tr></table></figure>
+
+<p>  通过帐号或邮箱查询用户 <code>id</code></p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;username&quot;:&quot;acc&quot;&#125;)</span><br><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;email&quot;:&quot;email@domain.com&quot;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>  根据返回的 <code>id</code> 对用户权限或其他信息进行修改</p>
+  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).update(&#123;&quot;_id&quot;:2&#125;, &#123;$set: &#123;&quot;role&quot;:&quot;admin&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>提示<br>权限说明： admin 为管理员权限，member 为会员权限</p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>YAPI</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux-CentOS 安装及配置 Oracle 服务器端</title>
     <url>/ap-20220503-aaaaa/</url>
     <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214446884.png" alt="Cover" title=" "></p>
@@ -224,159 +316,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux 部署 YAPI</title>
-    <url>/ap-20230720-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214527616.png" alt="Cover" title=" "></p>
-<hr>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
-<li>搭建 YApi 前需安装 <code>nodejs</code> 建议安装版本 12.x，高版本搭建时会出现异常</li>
-<li>搭建前需安装 <code>MongoDB</code>，根据 linux 发行版自行安装<ul>
-<li><p><code>MongoDB</code> 启动命令</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongod --logpath=/data/logs --fork</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<p>创建安装主目录，并进入该目录</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkdir yapi</span><br><span class="line">cd yapi</span><br></pre></td></tr></table></figure>
-
-<p>克隆项目到目录 <code>vendors</code> 下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone git@git.i:shayne/yapi.git vendors</span><br></pre></td></tr></table></figure>
-
-<p>将项目下的配置文件实例，复制到 <code>yapi</code> 主目录下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp vendors/config_example.json ./config.json</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>注意<br>请根据情况，修改 <code>config.json</code> 配置信息：<br>port 默认端口 <code>3000</code><br>closeRegister 禁止用户通过系统自行注册<br>adminAccount 管理员账户，初始化使用<br>包括数据库连接信息，db.user、 db.pass、 db.authSource 为 “”（空字符）即可</p>
-</blockquote>
-<p>修改安装源信息为淘宝源，并进行 yapi 安装</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install --production --registry https://registry.npm.taobao.org</span><br><span class="line">npm run install-server</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>注意<br>安装程序会初始化数据库索引和管理员账号，管理员账号名可在 config.json 配置<br>安装初始化完成后，控制台中会显示帐号信息，包括帐号及密码</p>
-</blockquote>
-<p>启动 yapi</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">node server/app.js</span><br></pre></td></tr></table></figure>
-
-<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul>
-<li><p>原版本在关闭注册及为使用 LDAP 时无法创建新用户，以上安装版本已修改为可通过工具调用新增用户 API 版本：<br>  <code>POST</code><br>  <code>Headers</code> : 传输 <code>Cookie</code> 参数<br>  <code>BODY</code> : <code>JSON</code>,</p>
-  <figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span><span class="string">&quot;name@domain.com&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span><span class="string">&quot;pwd&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>原版本中用户很多主要信息不能修改，包括邮箱，权限等，可通过后台连接 <code>MongoDB</code> 进行修改：<br>  连接 <code>MongoDB</code></p>
-  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mongo</span><br></pre></td></tr></table></figure>
-
-<p>  进入 <code>yapi</code> 数据库</p>
-  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">use yapi</span><br></pre></td></tr></table></figure>
-
-<p>  通过帐号或邮箱查询用户 <code>id</code></p>
-  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;username&quot;:&quot;acc&quot;&#125;)</span><br><span class="line">db.getCollection(&quot;user&quot;).find(&#123;&quot;email&quot;:&quot;email@domain.com&quot;&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>  根据返回的 <code>id</code> 对用户权限或其他信息进行修改</p>
-  <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.getCollection(&quot;user&quot;).update(&#123;&quot;_id&quot;:2&#125;, &#123;$set: &#123;&quot;role&quot;:&quot;admin&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>提示<br>权限说明： admin 为管理员权限，member 为会员权限</p>
-</blockquote>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>爱啪啪</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>YAPI</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Wallabag Q&amp;A</title>
-    <url>/ap-20240217-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214238178.png" alt="Cover" title=" "></p>
-<hr>
-<h2 id="手动部署完成后，访问服务页面错乱"><a href="#手动部署完成后，访问服务页面错乱" class="headerlink" title="手动部署完成后，访问服务页面错乱"></a>手动部署完成后，访问服务页面错乱</h2><p>通过 <code>git clone</code> 手动部署 Wallabag(版本 v2.6.8，不排除其他版本也存在该问题)完成，安装时，因文件夹 <code>wallassets</code> 及其下文件缺失，导致页面错乱。</p>
-<p>解决：</p>
-<ul>
-<li><p>访问 <code>https://github.com/wallabag/wallabag/releases</code> 下载对应 Wallabag 版本 <code>wallabag-x.x.x.tar.gz</code> 压缩文件，并解压文件。</p>
-</li>
-<li><p>将目录 <code>web/wallassets</code> 及其下文件复制到目录 <code>/var/www/wallabag/web/</code> 下。</p>
-</li>
-<li><p>变更目录所有者及权限：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chown</span> -R www-data:www-data /var/www/wallabag</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">chmod</span> -R 755 /var/www/wallabag</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<p><strong>Update 2024&#x2F;02&#x2F;20:</strong> 今天在 <span class="exturl" data-url="aHR0cHM6Ly9yZW5kZXIuY29tLw==">Render<i class="fa fa-external-link-alt"></i></span> 通过 Docker 部署 Wallabag 出现了同样的问题现象，但通过修改配置文件 <code>./root/etc/wallabag/parameters.template.yml</code> 中参数 <code>domain_name</code> 中的域名为发布域名，并重新部署启动后，该问题现象解决。</p>
-<p>在手动部署时，已多次排查配置文件 <code>./app/config/parameters.yml</code> 中各个参数，包括参数 <code>domain_name</code> 所配置的域名，均正确，初步怀疑是由于反向代理或端口转发造成。</p>
-<p>所以若出现该问题现象，优先检查配置文件中各参数是否配置正确，若无问题，再通过替换文件的方式解决。</p>
-]]></content>
-      <categories>
-        <category>爱啪啪</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Q&amp;A</tag>
-        <tag>Wallabag</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Docker 安装 &amp; 配置 GoToSocial</title>
-    <url>/ap-20240331-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240331181009324.png" alt="Cover"></p>
-<hr>
-<h2 id="GoToSocial-是啥"><a href="#GoToSocial-是啥" class="headerlink" title="GoToSocial 是啥"></a>GoToSocial 是啥</h2><blockquote>
-<p>GoToSocial 是用 Golang 编写的 ActivityPub 社交网络服务器。GoToSocial 为 Fediverse 提供了一个轻量级、可定制和注重安全的入口。通过 GoToSocial，您可以与朋友保持联系，发布、阅读和分享图片和文章。所有这一切都不会被跟踪或广告！</p>
-</blockquote>
-<p>以上白话就是，它是一款可私有部署的类微博应用。</p>
-<h2 id="选择理由"><a href="#选择理由" class="headerlink" title="选择理由"></a>选择理由</h2><ul>
-<li>项目搭建练手</li>
-<li>部署对软硬件环境要求较低</li>
-<li>日常生活、工作等事件记录及分享</li>
-<li>数据可控</li>
-<li>避免非正常数据监管</li>
-<li>对比 Memos，可与其他支持 ActivityPub 联邦服务器联通，用户之间可直接关注，而非系统孤岛</li>
-<li>多系统，多平台 Web 及客户端支持</li>
-</ul>
-<h2 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h2><ul>
-<li>服务器</li>
-<li>数据库 Postgres</li>
-<li>域名</li>
-</ul>
-<h2 id="Docker-安装-GoToSocial"><a href="#Docker-安装-GoToSocial" class="headerlink" title="Docker 安装 GoToSocial"></a>Docker 安装 GoToSocial</h2><p>数据库安装、配置及域名解析、反代不过多介绍，先掠过。</p>
-<p>首先，下载镜像文件</p>
-<p><strong>镜像文件</strong>： <code>docker pull superseriousbusiness/gotosocial:latest</code></p>
-<p>创建环境变量文件 <code>gotosocial.env</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/docker/env/gotosocial.env</span><br></pre></td></tr></table></figure>
-
-<p>添加以下环境变量内容，相关环境变量需根据个人实际情况调整</p>
-<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">GTS_HOST</span>=domain.com</span><br><span class="line"><span class="attr">GTS_DB_TYPE</span>=postgres</span><br><span class="line"><span class="attr">GTS_DB_ADDRESS</span>=dbhost</span><br><span class="line"><span class="attr">GTS_DB_PORT</span>=<span class="number">5432</span></span><br><span class="line"><span class="attr">GTS_DB_DATABASE</span>=dbbase</span><br><span class="line"><span class="attr">GTS_DB_USER</span>=dbuser</span><br><span class="line"><span class="attr">GTS_DB_PASSWORD</span>=dbpwd</span><br><span class="line"><span class="attr">GTS_LETSENCRYPT_ENABLED</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">GTS_STORAGE_BACKEND</span>=s3</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_BUCKET</span>=s3bucket</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ENDPOINT</span>=s3endpoiont</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ACCESS_KEY</span>=s3acckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_SECRET_KEY</span>=s3seckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_PROXY</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">TZ</span>=Asia/Chongqing</span><br></pre></td></tr></table></figure>
-
-<p><code>GTS_HOST</code>: 应用访问域名<br><code>GTS_STORAGE_BACKEND</code>：资源存储方式，包括 <code>local</code> 及 <code>s3</code>，<code>local</code> 为本地存储；<code>s3</code> 为对象存储，支持 Amazon S3、Cloudflare R2、minio 等<br><code>GTS_STORAGE_S3_PROXY</code>： 使用对象存储时配置为 <code>true</code>， 使用本地存储时配置为 <code>false</code><br><code>TZ</code>: 时区配置</p>
-<h2 id="Docker-启动-GoToSocial"><a href="#Docker-启动-GoToSocial" class="headerlink" title="Docker 启动 GoToSocial"></a>Docker 启动 GoToSocial</h2><p>相关准备完成后，则以 Docker 启动：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d --restart always --name gotosocial --env-file /etc/docker/env/gotosocial.env -p 443:8080 superseriousbusiness/gotosocial:latest</span><br></pre></td></tr></table></figure>
-
-<p>通过已解析的域名 <code>https://domain.com</code> 访问</p>
-<p><img src="https://assets.ishayne.com/ShareX/20240331181059237.png" alt="img"></p>
-<p>出现以上类似界面，则安装成功。</p>
-<h2 id="其他说明"><a href="#其他说明" class="headerlink" title="其他说明"></a>其他说明</h2><h3 id="用户创建"><a href="#用户创建" class="headerlink" title="用户创建"></a>用户创建</h3><p>目前 GoToSocial 仍处于开发阶段，前端无用户注册、创建页面及功能，需要在后台完成用户创建</p>
-<p><strong>创建用户</strong>命令</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account create --username uname --email u@email.com --password upwd</span><br></pre></td></tr></table></figure>
-
-<p><code>uname</code> 用户名<br><code>u@email.com</code> 邮箱<br><code>upwd</code> 密码  </p>
-<p><strong>确认用户</strong>命令，激活用户使其可登录</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account confirm --username uname</span><br></pre></td></tr></table></figure>
-
-<p><strong>授权用户</strong>命令，授予用户管理员权限</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account promote --username uname</span><br></pre></td></tr></table></figure>
-
-<p>访问域名 <code>https://domain.com/settings</code> ，登录并进行相关配置。</p>
-]]></content>
-      <categories>
-        <category>爱啪啪</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Docker</tag>
-        <tag>GoToSocial</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>应用迁移“翻新”</title>
     <url>/ap-20240229-aaaaa/</url>
     <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240229153610828.png" alt="Cover" title=" "></p>
@@ -514,6 +453,83 @@
       </tags>
   </entry>
   <entry>
+    <title>Docker 安装 &amp; 配置 GoToSocial</title>
+    <url>/ap-20240331-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240331181009324.png" alt="Cover"></p>
+<hr>
+<h2 id="GoToSocial-是啥"><a href="#GoToSocial-是啥" class="headerlink" title="GoToSocial 是啥"></a>GoToSocial 是啥</h2><blockquote>
+<p>GoToSocial 是用 Golang 编写的 ActivityPub 社交网络服务器。GoToSocial 为 Fediverse 提供了一个轻量级、可定制和注重安全的入口。通过 GoToSocial，您可以与朋友保持联系，发布、阅读和分享图片和文章。所有这一切都不会被跟踪或广告！</p>
+</blockquote>
+<p>以上白话就是，它是一款可私有部署的类微博应用。</p>
+<h2 id="选择理由"><a href="#选择理由" class="headerlink" title="选择理由"></a>选择理由</h2><ul>
+<li>项目搭建练手</li>
+<li>部署对软硬件环境要求较低</li>
+<li>日常生活、工作等事件记录及分享</li>
+<li>数据可控</li>
+<li>避免非正常数据监管</li>
+<li>对比 Memos，可与其他支持 ActivityPub 联邦服务器联通，用户之间可直接关注，而非系统孤岛</li>
+<li>多系统，多平台 Web 及客户端支持</li>
+</ul>
+<h2 id="安装准备"><a href="#安装准备" class="headerlink" title="安装准备"></a>安装准备</h2><ul>
+<li>服务器</li>
+<li>数据库 Postgres</li>
+<li>域名</li>
+</ul>
+<h2 id="Docker-安装-GoToSocial"><a href="#Docker-安装-GoToSocial" class="headerlink" title="Docker 安装 GoToSocial"></a>Docker 安装 GoToSocial</h2><p>数据库安装、配置及域名解析、反代不过多介绍，先掠过。</p>
+<p>首先，下载镜像文件</p>
+<p><strong>镜像文件</strong>： <code>docker pull superseriousbusiness/gotosocial:latest</code></p>
+<p>创建环境变量文件 <code>gotosocial.env</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/docker/env/gotosocial.env</span><br></pre></td></tr></table></figure>
+
+<p>添加以下环境变量内容，相关环境变量需根据个人实际情况调整</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">GTS_HOST</span>=domain.com</span><br><span class="line"><span class="attr">GTS_DB_TYPE</span>=postgres</span><br><span class="line"><span class="attr">GTS_DB_ADDRESS</span>=dbhost</span><br><span class="line"><span class="attr">GTS_DB_PORT</span>=<span class="number">5432</span></span><br><span class="line"><span class="attr">GTS_DB_DATABASE</span>=dbbase</span><br><span class="line"><span class="attr">GTS_DB_USER</span>=dbuser</span><br><span class="line"><span class="attr">GTS_DB_PASSWORD</span>=dbpwd</span><br><span class="line"><span class="attr">GTS_LETSENCRYPT_ENABLED</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">GTS_STORAGE_BACKEND</span>=s3</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_BUCKET</span>=s3bucket</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ENDPOINT</span>=s3endpoiont</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_ACCESS_KEY</span>=s3acckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_SECRET_KEY</span>=s3seckey</span><br><span class="line"><span class="attr">GTS_STORAGE_S3_PROXY</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">TZ</span>=Asia/Chongqing</span><br></pre></td></tr></table></figure>
+
+<p><code>GTS_HOST</code>: 应用访问域名<br><code>GTS_STORAGE_BACKEND</code>：资源存储方式，包括 <code>local</code> 及 <code>s3</code>，<code>local</code> 为本地存储；<code>s3</code> 为对象存储，支持 Amazon S3、Cloudflare R2、minio 等<br><code>GTS_STORAGE_S3_PROXY</code>： 使用对象存储时配置为 <code>true</code>， 使用本地存储时配置为 <code>false</code><br><code>TZ</code>: 时区配置</p>
+<h2 id="Docker-启动-GoToSocial"><a href="#Docker-启动-GoToSocial" class="headerlink" title="Docker 启动 GoToSocial"></a>Docker 启动 GoToSocial</h2><p>相关准备完成后，则以 Docker 启动：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d --restart always --name gotosocial --env-file /etc/docker/env/gotosocial.env -p 443:8080 superseriousbusiness/gotosocial:latest</span><br></pre></td></tr></table></figure>
+
+<p>通过已解析的域名 <code>https://domain.com</code> 访问</p>
+<p><img src="https://assets.ishayne.com/ShareX/20240331181059237.png" alt="img"></p>
+<p>出现以上类似界面，则安装成功。</p>
+<h2 id="其他说明"><a href="#其他说明" class="headerlink" title="其他说明"></a>其他说明</h2><h3 id="用户创建"><a href="#用户创建" class="headerlink" title="用户创建"></a>用户创建</h3><p>目前 GoToSocial 仍处于开发阶段，前端无用户注册、创建页面及功能，需要在后台完成用户创建</p>
+<p><strong>创建用户</strong>命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account create --username uname --email u@email.com --password upwd</span><br></pre></td></tr></table></figure>
+
+<p><code>uname</code> 用户名<br><code>u@email.com</code> 邮箱<br><code>upwd</code> 密码  </p>
+<p><strong>确认用户</strong>命令，激活用户使其可登录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account confirm --username uname</span><br></pre></td></tr></table></figure>
+
+<p><strong>授权用户</strong>命令，授予用户管理员权限</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it gotosocial /gotosocial/gotosocial admin account promote --username uname</span><br></pre></td></tr></table></figure>
+
+<p>访问域名 <code>https://domain.com/settings</code> ，登录并进行相关配置。</p>
+]]></content>
+      <categories>
+        <category>爱啪啪</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
+        <tag>GoToSocial</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>威远，夜徒</title>
+    <url>/li-20231003-aaaaa/</url>
+    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214619907.png" alt="Cover" title=" "></p>
+<hr>
+<p>已不知的，继续回味的。</p>
+]]></content>
+      <categories>
+        <category>如戏</category>
+      </categories>
+      <tags>
+        <tag>百态</tag>
+        <tag>故乡</tag>
+        <tag>威远</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2024 贺新春</title>
     <url>/li-20240209-aaaaa/</url>
     <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214644385.png" alt="Cover" title=" "></p>
@@ -560,22 +576,6 @@
       <tags>
         <tag>百态</tag>
         <tag>歌曲</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>威远，夜徒</title>
-    <url>/li-20231003-aaaaa/</url>
-    <content><![CDATA[<p><img src="https://assets.ishayne.com/ShareX/20240226214619907.png" alt="Cover" title=" "></p>
-<hr>
-<p>已不知的，继续回味的。</p>
-]]></content>
-      <categories>
-        <category>如戏</category>
-      </categories>
-      <tags>
-        <tag>百态</tag>
-        <tag>故乡</tag>
-        <tag>威远</tag>
       </tags>
   </entry>
 </search>
